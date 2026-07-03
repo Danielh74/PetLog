@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import Pet from '../models/Pet.ts';
 import AppError from '../utils/AppError.ts';
+import JsonifyText from '../utils/JsonifyText.ts';
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -37,9 +38,9 @@ Return 2-3 causes ordered from most to least probable.`;
   });
 
   const text = message.content[0]?.type === 'text' ? message.content[0].text : '';
-
+  const response = JsonifyText(text);
   try {
-    return JSON.parse(text) as {
+    return JSON.parse(response) as {
       causes: { name: string; likelihood: 'high' | 'medium' | 'low'; homeCare: string }[];
       urgency: 'can_wait' | 'within_48h' | 'go_now';
       disclaimer: string;
