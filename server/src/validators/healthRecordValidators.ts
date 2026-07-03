@@ -12,17 +12,17 @@ const recordTypeEnum = z.enum([
 export const createHealthRecordSchema = z.object({
   type: recordTypeEnum,
   title: z.string().min(1).max(200),
-  date: z.string().datetime({ offset: true }),
+  date: z.iso.datetime({ offset: true }),
   notes: z.string().max(2000).optional(),
   weight: z.number().positive().optional(),
-  nextDueDate: z.string().datetime({ offset: true }).optional(),
+  nextDueDate: z.iso.datetime({ offset: true }).optional(),
 });
 
 export const updateHealthRecordSchema = z.object({
   type: recordTypeEnum.optional(),
   title: z.string().min(1).max(200).optional(),
-  date: z.string().datetime({ offset: true }).optional(),
+  date: z.iso.datetime({ offset: true }).optional(),
   notes: z.string().max(2000).optional(),
   weight: z.number().positive().optional(),
-  nextDueDate: z.string().datetime({ offset: true }).optional(),
+  nextDueDate: z.iso.datetime({ offset: true }).optional(),
 });
