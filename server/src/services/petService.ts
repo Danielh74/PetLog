@@ -8,7 +8,7 @@ export const getPetsByOwner = async (ownerUid: string) => {
 };
 
 export const getPetById = async (petId: string, ownerUid: string) => {
-  const pet = await Pet.findById(petId);
+  const pet = await Pet.findById(petId).populate('healthRecords');
   if (!pet) throw new AppError('Pet not found', 404);
   if (pet.owner !== ownerUid) throw new AppError('Forbidden', 403);
   return pet;

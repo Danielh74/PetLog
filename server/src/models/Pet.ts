@@ -11,7 +11,14 @@ export interface IPet {
   photoUrl?: string;
 }
 
-export interface IPetDocument extends IPet, Document {}
+const options = {
+  toJSON: {
+    virtuals: true
+  },
+  timestamps: true
+}
+
+export interface IPetDocument extends IPet, Document { }
 
 const petSchema = new Schema<IPetDocument>(
   {
@@ -31,8 +38,12 @@ const petSchema = new Schema<IPetDocument>(
       index: true,
     },
     photoUrl: { type: String },
-  },
-  { timestamps: true }
-);
+  }, options);
+
+petSchema.virtual('healthRecords', {
+  ref: 'HealthRecord',
+  localField: '_id',
+  foreignField: 'pet',
+});
 
 export default mongoose.model<IPetDocument>('Pet', petSchema);
