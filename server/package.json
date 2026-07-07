@@ -2,18 +2,21 @@
   "name": "petlog",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "server.ts",
   "scripts": {
-    "dev": "node --watch src/index.ts",
-    "typecheck": "tsc --noEmit",
-    "start": "node --enable-source-maps src/index.ts"
+    "dev": "node --watch --experimental-strip-types server.ts",
+    "start": "node --experimental-strip-types server.ts",
+    "seed": "node --experimental-strip-types scripts/seed.ts",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/morgan": "^1.9.10",
     "@types/node": "^25.9.3",
     "typescript": "^6.0.3"
   },
@@ -21,9 +24,15 @@
     "node": ">=24"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.106.0",
     "@types/mongoose": "^5.11.96",
+    "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "mongoose": "^9.7.0"
+    "firebase-admin": "^14.1.0",
+    "helmet": "^8.2.0",
+    "mongoose": "^9.7.0",
+    "morgan": "^1.11.0",
+    "zod": "^4.4.3"
   }
 }
