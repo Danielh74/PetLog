@@ -3,5 +3,5 @@ import handleAsyncError from '../utils/handleAsyncError.ts';
 
 export const getMe = handleAsyncError(async (req, res) => {
   const user = await authService.syncUser(req.user);
-  res.json({ success: true, data: user });
+  res.json({ success: true, message: 'User fetched successfully', data: user });
 });
