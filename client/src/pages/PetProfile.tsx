@@ -2,11 +2,23 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Icon from '../components/Icon.tsx';
 import Toast from '../components/Toast.tsx';
+import DateInput from '../components/DateInput.tsx';
+import ConfirmDialog from '../components/ConfirmDialog.tsx';
+import AppLayout from '../components/AppLayout.tsx';
 import { useToast } from '../utils/useToast.ts';
-import { getPet } from '../api/pets.ts';
+import { getPet, updatePet, deletePet, type UpdatePetInput } from '../api/pets.ts';
 import { createRecord, type CreateRecordInput } from '../api/records.ts';
-import type { HealthRecord, HealthRecordType, Pet } from '../types/index.ts';
+import type { HealthRecord, HealthRecordType, Pet, Species } from '../types/index.ts';
 import { ageFromDob, formatDate, speciesIcon, speciesLabel } from '../utils/petMeta.ts';
+import './PetProfile.css';
+
+const SPECIES_LABELS: Record<Species, string> = {
+  dog: 'Dog',
+  cat: 'Cat',
+  bird: 'Bird',
+  rabbit: 'Rabbit',
+  other: 'Other',
+};
 
 const TYPE_META: Record<HealthRecordType, { icon: string; label: string; tone: string }> = {
   vaccination: { icon: 'vaccines', label: 'Vaccination', tone: 'vax' },
@@ -66,10 +78,7 @@ const AddRecordForm = ({
           <label>Title</label>
           <input value={title} onChange={(e) => setTitle(e.target.value)} />
         </div>
-        <div className="field">
-          <label>Date</label>
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-        </div>
+        <DateInput label="Date" value={date} onChange={setDate} />
         {type === 'weight' && (
           <div className="field">
             <label>Weight (kg)</label>
@@ -77,10 +86,7 @@ const AddRecordForm = ({
           </div>
         )}
         {(type === 'vaccination' || type === 'medication') && (
-          <div className="field">
-            <label>Next due (optional)</label>
-            <input type="date" value={nextDueDate} onChange={(e) => setNextDueDate(e.target.value)} />
-          </div>
+          <DateInput label="Next due (optional)" value={nextDueDate} onChange={setNextDueDate} />
         )}
         <div className="field">
           <label>Notes (optional)</label>
@@ -89,6 +95,65 @@ const AddRecordForm = ({
         <button className="btn btn-primary" onClick={submit}>
           Save
         </button>
+      </div>
+    </div>
+  );
+};
+
+const EditPetForm = ({
+  pet,
+  onCancel,
+  onSaved,
+}: {
+  pet: Pet;
+  onCancel: () => void;
+  onSaved: (input: UpdatePetInput) => void;
+}) => {
+  const [name, setName] = useState(pet.name);
+  const [species, setSpecies] = useState<Species>(pet.species);
+  const [breed, setBreed] = useState(pet.breed ?? '');
+  const [dob, setDob] = useState(pet.dob ?? '');
+
+  const submit = () => {
+    onSaved({
+      name: name.trim(),
+      species,
+      breed: breed.trim() || undefined,
+      ...(dob && { dob: new Date(dob).toISOString() }),
+    });
+  };
+
+  return (
+    <div>
+      <div className="sheet-title">Edit pet</div>
+      <div className="add-record-body">
+        <div className="field">
+          <label>Name</label>
+          <input value={name} onChange={(e) => setName(e.target.value)} />
+        </div>
+        <div className="field">
+          <label>Species</label>
+          <select value={species} onChange={(e) => setSpecies(e.target.value as Species)}>
+            {Object.entries(SPECIES_LABELS).map(([id, label]) => (
+              <option key={id} value={id}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="field">
+          <label>Breed</label>
+          <input value={breed} onChange={(e) => setBreed(e.target.value)} />
+        </div>
+        <DateInput label="Birthday" value={dob} onChange={setDob} />
+        <div className="row gap-sm edit-pet-actions">
+          <button className="btn btn-outline" onClick={onCancel}>
+            Cancel
+          </button>
+          <button className="btn btn-primary" onClick={submit}>
+            Save changes
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -105,6 +170,10 @@ const PetProfile = () => {
   const [filter, setFilter] = useState<HealthRecordType | 'all'>('all');
   const [sheetOpen, setSheetOpen] = useState(false);
   const [chosenType, setChosenType] = useState<HealthRecordType | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const load = () => {
     if (!id) return;
@@ -136,19 +205,43 @@ const PetProfile = () => {
     showToast('Share link copied to clipboard');
   };
 
+  const handleUpdatePet = async (input: UpdatePetInput) => {
+    if (!id) return;
+    await updatePet(id, input);
+    setEditOpen(false);
+    showToast('Pet updated');
+    load();
+  };
+
+  const handleDeletePet = async () => {
+    if (!id) return;
+    setDeleting(true);
+    try {
+      await deletePet(id);
+      navigate('/dashboard');
+    } catch {
+      setDeleting(false);
+      showToast('Could not delete this pet. Please try again.');
+    }
+  };
+
   if (loading) {
     return (
-      <div className="app-shell center profile-center-fill">
-        <span className="spinner" />
-      </div>
+      <AppLayout>
+        <div className="center profile-center-fill">
+          <span className="spinner" />
+        </div>
+      </AppLayout>
     );
   }
 
   if (error || !pet) {
     return (
-      <div className="app-shell center profile-center-fill with-pad">
-        <p className="muted">{error || 'Pet not found.'}</p>
-      </div>
+      <AppLayout>
+        <div className="center profile-center-fill with-pad">
+          <p className="muted">{error || 'Pet not found.'}</p>
+        </div>
+      </AppLayout>
     );
   }
 
@@ -164,11 +257,12 @@ const PetProfile = () => {
   const wMin = weightRecords.length ? Math.min(...weightRecords.map((w) => w.weight)) : 0;
 
   return (
-    <div className="app-shell">
+    <AppLayout>
       <div className="page">
-        <div className="top-bar profile-topbar">
-          <button className="icon-btn" onClick={() => navigate('/dashboard')}>
-            <Icon name="arrow_back" />
+        <div className="top-bar shell-topbar profile-topbar">
+          <button className="topbar-back-link" onClick={() => navigate('/dashboard')}>
+            <Icon name="arrow_back" size={18} />
+            My Pets
           </button>
           <span className="grow" />
           <button className="btn btn-outline btn-sm" onClick={() => navigate(`/pets/${id}/symptom-check`)}>
@@ -176,8 +270,40 @@ const PetProfile = () => {
             Check symptom
           </button>
           <button className="icon-btn" onClick={handleShare} aria-label="Share">
-            <Icon name="ios_share" size={23} />
+            <Icon name="ios_share" size={22} />
           </button>
+          <div className="menu-anchor">
+            <button className="icon-btn" onClick={() => setMenuOpen((v) => !v)} aria-label="More options">
+              <Icon name="more_vert" size={22} />
+            </button>
+            {menuOpen && (
+              <>
+                <div className="menu-backdrop" onClick={() => setMenuOpen(false)} />
+                <div className="menu-popover">
+                  <button
+                    className="menu-item"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setEditOpen(true);
+                    }}
+                  >
+                    <Icon name="edit" size={18} />
+                    Edit pet
+                  </button>
+                  <button
+                    className="menu-item danger"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setDeleteOpen(true);
+                    }}
+                  >
+                    <Icon name="delete" size={18} />
+                    Delete pet
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         <div className="scroll-area">
@@ -192,79 +318,92 @@ const PetProfile = () => {
               </div>
             </div>
 
-            <div className="stats-grid">
-              <div className="card stat-card">
-                <div className="stat-value">{ageFromDob(pet.dob)}</div>
-                <div className="muted stat-label">Age</div>
-              </div>
-              <div className="card stat-card">
-                <div className="stat-value">{latestWeight != null ? `${latestWeight} kg` : '—'}</div>
-                <div className="muted stat-label">Weight</div>
-              </div>
-              <div className="card stat-card">
-                <div className="stat-value">{records.length}</div>
-                <div className="muted stat-label">Records</div>
-              </div>
-            </div>
-
-            {weightRecords.length > 1 && (
-              <div className="card weight-card">
-                <div className="row weight-header">
-                  <span className="weight-title">Weight trend</span>
-                  <span className="muted weight-unit">kg</span>
+            <div className="profile-columns">
+              <div className="profile-col-main">
+                <div className="stats-grid">
+                  <div className="card stat-card">
+                    <div className="stat-value">{ageFromDob(pet.dob)}</div>
+                    <div className="muted stat-label">Age</div>
+                  </div>
+                  <div className="card stat-card">
+                    <div className="stat-value">{latestWeight != null ? `${latestWeight} kg` : '—'}</div>
+                    <div className="muted stat-label">Weight</div>
+                  </div>
+                  <div className="card stat-card">
+                    <div className="stat-value">{records.length}</div>
+                    <div className="muted stat-label">Records</div>
+                  </div>
                 </div>
-                <div className="weight-bars">
-                  {weightRecords.map((w, i) => (
-                    <div key={w._id} className="weight-bar-col">
-                      <div
-                        className={`weight-bar${i === weightRecords.length - 1 ? ' latest' : ''}`}
-                        style={{ height: `${10 + ((w.weight - wMin) / Math.max(wMax - wMin, 1)) * 90}%` }}
-                      />
-                      <span className="muted weight-bar-label">{formatDate(w.date)}</span>
+
+                {weightRecords.length > 1 && (
+                  <div className="card weight-card">
+                    <div className="row weight-header">
+                      <span className="weight-title">Weight trend</span>
+                      <span className="muted weight-unit">kg</span>
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="pill-row filter-row">
-              {FILTERS.map((f) => (
-                <button key={f.id} className={`pill${filter === f.id ? ' active' : ''}`} onClick={() => setFilter(f.id)}>
-                  {f.label}
-                </button>
-              ))}
-            </div>
-
-            {shown.length === 0 && <p className="muted empty-state">No records in this filter yet.</p>}
-
-            <div className="record-timeline">
-              {shown.map((r, i) => {
-                const meta = TYPE_META[r.type];
-                return (
-                  <div key={r._id} className="row gap-md record-row">
-                    <div className="stack record-icon-col">
-                      <span className={`avatar record-icon tone-${meta.tone}`}>
-                        <Icon name={meta.icon} size={20} />
-                      </span>
-                      {i !== shown.length - 1 && <span className="record-line" />}
-                    </div>
-                    <div className="record-content">
-                      <div className="row record-title-row">
-                        <span className="record-title">{r.title}</span>
-                        <span className="muted grow record-date">{formatDate(r.date)}</span>
-                      </div>
-                      {r.notes && <div className="muted record-notes">{r.notes}</div>}
+                    <div className="weight-bars">
+                      {weightRecords.map((w, i) => (
+                        <div key={w._id} className="weight-bar-col">
+                          <div
+                            className={`weight-bar${i === weightRecords.length - 1 ? ' latest' : ''}`}
+                            style={{ height: `${10 + ((w.weight - wMin) / Math.max(wMax - wMin, 1)) * 90}%` }}
+                          />
+                          <span className="muted weight-bar-label">{formatDate(w.date)}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                );
-              })}
+                )}
+              </div>
+
+              <div className="card profile-col-log">
+                <div className="row gap-sm health-log-header">
+                  <span className="health-log-title grow">Health log</span>
+                  <button className="icon-btn log-add-btn" onClick={() => setSheetOpen(true)} aria-label="Add record">
+                    <Icon name="add" size={19} />
+                  </button>
+                </div>
+
+                <div className="pill-row filter-row">
+                  {FILTERS.map((f) => (
+                    <button
+                      key={f.id}
+                      className={`pill${filter === f.id ? ' active' : ''}`}
+                      onClick={() => setFilter(f.id)}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+
+                {shown.length === 0 && <p className="muted empty-state">No records in this filter yet.</p>}
+
+                <div className="record-timeline">
+                  {shown.map((r, i) => {
+                    const meta = TYPE_META[r.type];
+                    return (
+                      <div key={r._id} className="row gap-md record-row">
+                        <div className="stack record-icon-col">
+                          <span className={`avatar record-icon tone-${meta.tone}`}>
+                            <Icon name={meta.icon} size={20} />
+                          </span>
+                          {i !== shown.length - 1 && <span className="record-line" />}
+                        </div>
+                        <div className="record-content">
+                          <div className="row record-title-row">
+                            <span className="record-title">{r.title}</span>
+                            <span className="muted grow record-date">{formatDate(r.date)}</span>
+                          </div>
+                          {r.notes && <div className="muted record-notes">{r.notes}</div>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
         </div>
-
-        <button className="fab-round" onClick={() => setSheetOpen(true)} aria-label="Add record">
-          <Icon name="add" size={28} />
-        </button>
 
         {sheetOpen && (
           <>
@@ -291,9 +430,31 @@ const PetProfile = () => {
           </>
         )}
 
+        {editOpen && (
+          <>
+            <div className="sheet-scrim" onClick={() => setEditOpen(false)} />
+            <div className="sheet">
+              <div className="sheet-handle" />
+              <EditPetForm pet={pet} onCancel={() => setEditOpen(false)} onSaved={handleUpdatePet} />
+            </div>
+          </>
+        )}
+
+        {deleteOpen && (
+          <ConfirmDialog
+            title="Delete this pet?"
+            message={`This permanently removes ${pet.name} and all of their health records and reminders. This can't be undone.`}
+            confirmLabel="Delete"
+            danger
+            busy={deleting}
+            onCancel={() => setDeleteOpen(false)}
+            onConfirm={handleDeletePet}
+          />
+        )}
+
         {toast && <Toast message={toast} />}
       </div>
-    </div>
+    </AppLayout>
   );
 };
 

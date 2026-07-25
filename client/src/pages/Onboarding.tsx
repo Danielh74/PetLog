@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../components/Icon.tsx';
+import DateInput from '../components/DateInput.tsx';
+import FocusedLayout from '../components/FocusedLayout.tsx';
 import { createPet } from '../api/pets.ts';
 import { createReminder } from '../api/reminders.ts';
 import { createRecord } from '../api/records.ts';
 import type { Species } from '../types/index.ts';
+import './Onboarding.css';
 
 const SPECIES_OPTIONS: { id: Species; label: string; icon: string }[] = [
   { id: 'dog', label: 'Dog', icon: 'sound_detection_dog_barking' },
@@ -39,6 +42,12 @@ const addMonthsToNow = (months: number) => {
 };
 
 const STEPS = ['species', 'details', 'plan'] as const;
+
+const ASIDE_ITEMS = [
+  { icon: 'auto_awesome', text: "Species drives which vaccines and check-ups we suggest — dogs and cats need different core shots." },
+  { icon: 'schedule', text: 'Reminders are scheduled the moment you finish — no extra setup.' },
+  { icon: 'edit', text: 'Everything here can be edited later from the pet profile.' },
+];
 
 const Onboarding = () => {
   const navigate = useNavigate();
@@ -106,11 +115,11 @@ const Onboarding = () => {
   const canContinue = step === 'details' ? name.trim().length > 0 : true;
 
   return (
-    <div className="app-shell">
+    <FocusedLayout asideTitle="Why we ask" asideItems={ASIDE_ITEMS}>
       <div className="page">
         <div className="top-bar">
           <button className="icon-btn" onClick={goBack}>
-            <Icon name="arrow_back" />
+            <Icon name="arrow_back" size={21} />
           </button>
           <span className="grow topbar-title">
             Add a pet
@@ -158,10 +167,7 @@ const Onboarding = () => {
                   <input value={breed} onChange={(e) => setBreed(e.target.value)} placeholder="Golden Retriever" />
                 </div>
                 <div className="field-row">
-                  <div className="field">
-                    <label>Birthday</label>
-                    <input type="date" value={dob} onChange={(e) => setDob(e.target.value)} />
-                  </div>
+                  <DateInput label="Birthday" value={dob} onChange={setDob} />
                   <div className="field">
                     <label>Weight (kg)</label>
                     <input
@@ -221,7 +227,7 @@ const Onboarding = () => {
           </button>
         </div>
       </div>
-    </div>
+    </FocusedLayout>
   );
 };
 

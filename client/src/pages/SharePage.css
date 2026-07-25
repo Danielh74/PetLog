@@ -1,0 +1,159 @@
+.share-page-fill {
+  min-height: 100vh;
+  padding: 24px;
+}
+.share-wrap {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px 80px;
+  background: var(--md-sys-color-surface-dim);
+}
+.share-col {
+  width: 100%;
+  max-width: 760px;
+}
+.share-topline {
+  margin-bottom: 22px;
+}
+.share-logo-mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--brand);
+  color: var(--text-on-brand);
+  display: grid;
+  place-items: center;
+}
+.share-wordmark {
+  font-family: var(--pawly-font-display);
+  font-size: 18px;
+  font-weight: 600;
+}
+.share-readonly-badge {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  border: 1px solid var(--border-strong);
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+.share-hero {
+  background: var(--brand);
+  color: var(--text-on-brand);
+  border-radius: 20px;
+  padding: 26px;
+  margin-bottom: 20px;
+}
+.share-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.share-name {
+  font-family: var(--pawly-font-display);
+  font-size: 26px;
+  font-weight: 600;
+}
+.share-meta {
+  font-size: 14.5px;
+  opacity: 0.92;
+}
+.share-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.share-section {
+  background: var(--surface-card);
+  border-radius: 18px;
+  padding: 20px;
+}
+.share-section-title-row {
+  margin-bottom: 14px;
+}
+.share-section-title {
+  font-weight: 600;
+  font-size: 15px;
+}
+.share-badge-watch {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--status-watch);
+}
+.vax-row {
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+.vax-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  flex: none;
+  background: var(--status-healthy);
+}
+.vax-dot.watch {
+  background: var(--status-watch);
+}
+.vax-dot-sm {
+  width: 7px;
+  height: 7px;
+}
+.status-label {
+  margin-left: auto;
+  font-size: 12.5px;
+}
+.share-record-row {
+  align-items: flex-start;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+.share-record-icon {
+  flex: none;
+  margin-top: 1px;
+}
+.share-record-title {
+  font-size: 14px;
+  font-weight: 500;
+}
+.share-record-notes {
+  font-size: 12.5px;
+}
+.share-record-date {
+  font-size: 12px;
+  white-space: nowrap;
+}
+.share-cta-card {
+  text-align: center;
+  border: 1px dashed var(--border-strong);
+  border-radius: 16px;
+  padding: 24px;
+}
+.share-cta-text {
+  font-size: 13.5px;
+  margin-bottom: 14px;
+}
+.share-cta-btn {
+  width: auto;
+  height: 44px;
+  padding: 0 22px;
+  margin: 0 auto;
+}
+.share-not-found {
+  justify-content: center;
+}
+.not-found-hint {
+  margin-top: 12px;
+}
+.icon-brand {
+  color: var(--brand);
+}
+.hint-text {
+  font-size: 13px;
+}
