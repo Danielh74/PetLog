@@ -6,6 +6,7 @@ export interface IPet {
   name: string;
   species: 'dog' | 'cat' | 'bird' | 'rabbit' | 'other';
   breed?: string;
+  weight?: number;
   dob?: Date;
   shareToken: string;
   photoUrl?: string;
@@ -30,6 +31,7 @@ const petSchema = new Schema<IPetDocument>(
       required: true,
     },
     breed: { type: String, trim: true },
+    weight: { type: Number },
     dob: { type: Date },
     shareToken: {
       type: String,

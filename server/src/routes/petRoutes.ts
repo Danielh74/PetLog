@@ -6,6 +6,7 @@ import { createReminderSchema } from '../validators/reminderValidators.ts';
 import * as petController from '../controllers/petController.ts';
 import { createReminder } from '../controllers/reminderController.ts';
 import healthRecordRouter from './healthRecordRoutes.ts';
+import { symptomCheckSchema } from '../validators/aiValidators.ts';
 
 const router = Router();
 
@@ -20,6 +21,7 @@ router.post('/', validate(createPetSchema), petController.createPet);
 router.get('/:id', petController.getPet);
 router.patch('/:id', validate(updatePetSchema), petController.updatePet);
 router.delete('/:id', petController.deletePet);
+router.post('/:id/symptom-check', validate(symptomCheckSchema), petController.symptomCheck);
 
 // Nested: POST /api/pets/:id/reminders
 router.post('/:id/reminders', validate(createReminderSchema), createReminder);
