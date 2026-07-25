@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Icon from '../components/Icon.tsx';
-import BottomNav from '../components/BottomNav.tsx';
+import AppLayout from '../components/AppLayout.tsx';
 import { getReminders, updateReminder } from '../api/reminders.ts';
 import type { Reminder } from '../types/index.ts';
 import { relativeDue } from '../utils/petMeta.ts';
+import './Reminders.css';
 
 const Reminders = () => {
-  const navigate = useNavigate();
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -27,17 +26,14 @@ const Reminders = () => {
   const done = reminders.filter((r) => r.isDone);
 
   return (
-    <div className="app-shell">
+    <AppLayout>
       <div className="page">
-        <div className="top-bar">
-          <button className="icon-btn" onClick={() => navigate('/dashboard')}>
-            <Icon name="arrow_back" />
-          </button>
+        <div className="top-bar shell-topbar">
           <span className="grow topbar-title">Reminders</span>
         </div>
 
         <div className="scroll-area">
-          <div className="page-pad">
+          <div className="page-pad reminders-list">
             {loading && (
               <div className="center spinner-wrap">
                 <span className="spinner" />
@@ -63,7 +59,7 @@ const Reminders = () => {
                       <div className="reminder-detail">{due.label}</div>
                     </div>
                     <button className="icon-btn ml-auto" onClick={() => markDone(r._id)} aria-label="Mark done">
-                      <Icon name="check_circle" />
+                      <Icon name="check_circle" size={21} />
                     </button>
                   </div>
                 );
@@ -84,9 +80,8 @@ const Reminders = () => {
             )}
           </div>
         </div>
-        <BottomNav />
       </div>
-    </div>
+    </AppLayout>
   );
 };
 

@@ -1,0 +1,19 @@
+.account-page {
+  padding-top: 24px;
+}
+.account-avatar {
+  width: 74px;
+  height: 74px;
+  font-size: 26px;
+  font-weight: 600;
+}
+.account-name {
+  margin-top: 14px;
+}
+.account-email {
+  font-size: 14px;
+}
+.account-logout {
+  margin-top: 30px;
+  max-width: 280px;
+}

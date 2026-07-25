@@ -8,6 +8,14 @@ export const speciesIcon: Record<Species, string> = {
   other: 'pets',
 };
 
+export const speciesTone: Record<Species, string> = {
+  dog: 'species-dog',
+  cat: 'species-cat',
+  bird: 'species-bird',
+  rabbit: 'species-rabbit',
+  other: 'species-other',
+};
+
 export const speciesLabel: Record<Species, string> = {
   dog: 'Dog',
   cat: 'Cat',

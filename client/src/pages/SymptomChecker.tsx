@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Icon from '../components/Icon.tsx';
+import FocusedLayout from '../components/FocusedLayout.tsx';
 import { getPet } from '../api/pets.ts';
 import { checkSymptoms } from '../api/ai.ts';
 import type { Pet, SymptomCheckResult, Urgency } from '../types/index.ts';
+import './SymptomChecker.css';
 
 type Step = 'intro' | 'q1' | 'q2' | 'q3' | 'loading' | 'verdict' | 'error';
 
 const Q = [
-  { key: 'q1' as const, title: 'How long has this been going on?', options: ['Just today', '1–2 days', '2–3 days', 'Over a week'] },
+  { key: 'q1' as const, title: 'How long has this been going on?', options: ['Just today', '1-2 days', '2-3 days', 'Over a week'] },
   { key: 'q2' as const, title: 'Are they eating normally?', options: ['Normally', 'Mostly', 'Very little', 'Not at all'] },
   { key: 'q3' as const, title: 'Any of these warning signs?', options: ['None', 'Vomiting', 'Lethargic / weak', 'Trouble breathing'] },
 ];
@@ -21,12 +23,18 @@ const VERDICT_META: Record<Urgency, { icon: string; tag: string; headline: strin
   go_now: { icon: 'emergency', tag: 'High urgency', headline: 'Go now', tone: 'alert' },
 };
 
+const ASIDE_ITEMS = [
+  { icon: 'emergency', text: 'Struggling to breathe, collapsed, or non-responsive — go to an emergency vet immediately, skip this checker.' },
+  { icon: 'schedule', text: 'Symptoms present over a day, with reduced appetite, usually warrant a same-week visit.' },
+  { icon: 'info', text: "This tool estimates urgency only — it never replaces a vet's exam." },
+];
+
 const SymptomChecker = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [pet, setPet] = useState<Pet | null>(null);
   const [step, setStep] = useState<Step>('intro');
-  const [answers, setAnswers] = useState<Record<string, string>>({ q1: '2–3 days', q2: 'Mostly', q3: 'None' });
+  const [answers, setAnswers] = useState<Record<string, string>>({ q1: '2-3 days', q2: 'Mostly', q3: 'None' });
   const [loadingMsg, setLoadingMsg] = useState(0);
   const [result, setResult] = useState<SymptomCheckResult | null>(null);
   const msgTimer = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -76,12 +84,12 @@ const SymptomChecker = () => {
   const currentQ = Q.find((q) => q.key === step);
 
   return (
-    <div className="app-shell">
+    <FocusedLayout asideTitle="Know the signs" asideItems={ASIDE_ITEMS}>
       <div className="page">
         <div className="top-bar">
           {step !== 'loading' && step !== 'verdict' && step !== 'error' && (
             <button className="icon-btn" onClick={handleBack}>
-              <Icon name="arrow_back" />
+              <Icon name="arrow_back" size={21} />
             </button>
           )}
           <span className="grow topbar-title">
@@ -200,7 +208,7 @@ const SymptomChecker = () => {
           )}
         </div>
       </div>
-    </div>
+    </FocusedLayout>
   );
 };
 

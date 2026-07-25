@@ -1,0 +1,122 @@
+.auth-wrap {
+  min-height: 100vh;
+  display: flex;
+}
+
+/* Brand panel — desktop only, per design (mobile gets a plain centered form) */
+.auth-brand {
+  display: none;
+}
+
+.auth-form-wrap {
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: var(--md-sys-color-surface-dim);
+}
+.auth-form-col {
+  width: 100%;
+  max-width: 380px;
+}
+.auth-form-title {
+  font-size: 25px;
+  margin-bottom: 6px;
+}
+.auth-form-subtitle {
+  margin-bottom: 28px;
+  font-size: 14.5px;
+}
+.auth-submit {
+  height: 46px;
+  margin-top: 4px;
+}
+.login-field-tight {
+  margin-bottom: 18px;
+}
+.divider-row {
+  margin: 20px 0;
+  font-size: 12px;
+}
+.divider-line {
+  height: 1px;
+  background: var(--border);
+}
+.login-footer {
+  text-align: center;
+  margin-top: 22px;
+  font-size: 13.5px;
+}
+.link-text {
+  color: var(--brand);
+  font-weight: 600;
+  cursor: pointer;
+}
+.error-text {
+  color: var(--status-alert);
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+@media (min-width: 900px) {
+  .auth-brand {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1 1 46%;
+    min-width: 420px;
+    background: linear-gradient(160deg, var(--brand), color-mix(in srgb, var(--brand) 72%, #000));
+    color: var(--md-sys-color-on-primary);
+    padding: 64px;
+  }
+  .auth-form-wrap {
+    flex: 1 1 54%;
+  }
+  .auth-brand-logo {
+    margin-bottom: 44px;
+  }
+  .auth-logo-mark {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.22);
+    display: grid;
+    place-items: center;
+  }
+  .auth-wordmark {
+    font-family: var(--pawly-font-display);
+    font-size: 21px;
+    font-weight: 600;
+  }
+  .auth-headline {
+    font-size: 38px;
+    font-weight: 600;
+    line-height: 1.15;
+    margin: 0 0 16px;
+    max-width: 420px;
+  }
+  .auth-subtext {
+    font-size: 15.5px;
+    line-height: 1.6;
+    opacity: 0.92;
+    max-width: 400px;
+    margin: 0 0 32px;
+  }
+  .auth-bullets {
+    max-width: 380px;
+  }
+  .auth-bullet {
+    font-size: 14.5px;
+  }
+  .auth-bullet-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.16);
+    display: grid;
+    place-items: center;
+    flex: none;
+  }
+}

@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import Icon from '../components/Icon.tsx';
-import BottomNav from '../components/BottomNav.tsx';
+import AppLayout from '../components/AppLayout.tsx';
 import { useAuth } from '../context/AuthContext.tsx';
+import './Account.css';
 
 const Account = () => {
   const { appUser, logout } = useAuth();
@@ -13,9 +14,9 @@ const Account = () => {
   };
 
   return (
-    <div className="app-shell">
+    <AppLayout>
       <div className="page">
-        <div className="top-bar">
+        <div className="top-bar shell-topbar">
           <span className="grow topbar-title">Account</span>
         </div>
         <div className="scroll-area">
@@ -30,9 +31,8 @@ const Account = () => {
             </button>
           </div>
         </div>
-        <BottomNav />
       </div>
-    </div>
+    </AppLayout>
   );
 };
 
