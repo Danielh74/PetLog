@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.tsx';
 import ProtectedRoute from './components/ProtectedRoute.tsx';
+import { useAuth } from './context/AuthContext.tsx';
+import Landing from './pages/Landing.tsx';
 import Login from './pages/Login.tsx';
 import Dashboard from './pages/Dashboard.tsx';
 import Reminders from './pages/Reminders.tsx';
@@ -10,12 +12,18 @@ import PetProfile from './pages/PetProfile.tsx';
 import SymptomChecker from './pages/SymptomChecker.tsx';
 import SharePage from './pages/SharePage.tsx';
 
+const AuthenticatedRoot = () => {
+  const { firebaseUser, loading } = useAuth();
+  if (loading) return <div />;
+  return firebaseUser ? <Navigate to="/dashboard" replace /> : <Landing />;
+};
+
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<AuthenticatedRoot />} />
           <Route path="/login" element={<Login />} />
           <Route path="/share/:token" element={<SharePage />} />
           <Route
@@ -66,7 +74,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

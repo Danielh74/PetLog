@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Icon from '../components/Icon.tsx';
 import { getPublicPet } from '../api/pets.ts';
 import type { Pet } from '../types/index.ts';
 import { ageFromDob, formatDate, speciesIcon, speciesLabel } from '../utils/petMeta.ts';
+import './SharePage.css';
 
 const SharePage = () => {
   const { token } = useParams<{ token: string }>();
+  const navigate = useNavigate();
   const [pet, setPet] = useState<Pet | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -21,7 +23,7 @@ const SharePage = () => {
 
   if (loading) {
     return (
-      <div className="app-shell center profile-center-fill">
+      <div className="center share-page-fill">
         <span className="spinner" />
       </div>
     );
@@ -29,7 +31,7 @@ const SharePage = () => {
 
   if (notFound || !pet) {
     return (
-      <div className="app-shell center share-not-found">
+      <div className="center share-page-fill share-not-found">
         <Icon name="link_off" size={40} className="muted" />
         <p className="muted not-found-hint">This share link isn't valid or has been removed.</p>
       </div>
@@ -51,77 +53,81 @@ const SharePage = () => {
   const dueSoonCount = vaccinations.filter((v) => vaxStatus(v.nextDueDate).watch).length;
 
   return (
-    <div className="app-shell share-shell">
-      <div className="page">
-        <div className="share-header">
-          <div className="row gap-sm share-lock-row">
-            <Icon name="lock" size={17} />
-            Read-only · shared via PetLog
-          </div>
-          <div className="row gap-md">
-            <span className="share-avatar">
-              <Icon name={speciesIcon[pet.species]} size={34} filled />
-            </span>
-            <div>
-              <div className="share-name">{pet.name}</div>
-              <div className="share-meta">
-                {(pet.breed || speciesLabel[pet.species])} · {ageFromDob(pet.dob)}
-              </div>
+    <div className="share-wrap">
+      <div className="share-col">
+        <div className="row gap-sm share-topline">
+          <span className="share-logo-mark">
+            <Icon name="pets" size={17} filled />
+          </span>
+          <span className="share-wordmark">PetLog</span>
+          <span className="grow" />
+          <span className="row gap-sm share-readonly-badge">
+            <Icon name="lock" size={16} />
+            Read-only share
+          </span>
+        </div>
+
+        <div className="row gap-md share-hero">
+          <span className="share-avatar">
+            <Icon name={speciesIcon[pet.species]} size={38} filled />
+          </span>
+          <div>
+            <div className="share-name">{pet.name}</div>
+            <div className="share-meta">
+              {(pet.breed || speciesLabel[pet.species])} · {ageFromDob(pet.dob)}
             </div>
           </div>
         </div>
 
-        <div className="scroll-area">
-          <div className="stack gap-md share-body">
-            <div className="share-section">
-              <div className="row gap-sm share-section-title-row">
-                <Icon name="vaccines" size={21} filled className="icon-brand" />
-                <span className="share-section-title">Vaccinations</span>
-                {dueSoonCount > 0 && (
-                  <span className="row gap-sm share-badge-watch">
-                    <span className="vax-dot watch vax-dot-sm" />
-                    {dueSoonCount} due soon
-                  </span>
-                )}
-              </div>
-              {vaccinations.length === 0 && <p className="muted hint-text">No vaccinations recorded yet.</p>}
-              {vaccinations.map((v) => {
-                const status = vaxStatus(v.nextDueDate);
-                return (
-                  <div key={v._id} className="row gap-md vax-row">
-                    <span className={`vax-dot${status.watch ? ' watch' : ''}`} />
-                    <span className="share-record-title">{v.title}</span>
-                    <span className="muted status-label">{status.label}</span>
-                  </div>
-                );
-              })}
+        <div className="share-grid">
+          <div className="share-section">
+            <div className="row gap-sm share-section-title-row">
+              <Icon name="vaccines" size={21} filled className="icon-brand" />
+              <span className="share-section-title">Vaccinations</span>
+              {dueSoonCount > 0 && (
+                <span className="row gap-sm share-badge-watch">
+                  <span className="vax-dot watch vax-dot-sm" />
+                  {dueSoonCount} due soon
+                </span>
+              )}
             </div>
-
-            <div className="share-section">
-              <div className="row gap-sm share-section-title-row">
-                <Icon name="clinical_notes" size={21} filled className="icon-brand" />
-                <span className="share-section-title">Recent records</span>
-              </div>
-              {others.length === 0 && <p className="muted hint-text">No other records yet.</p>}
-              {others.map((r) => (
-                <div key={r._id} className="row gap-md share-record-row">
-                  <Icon name="event_note" size={19} className="muted share-record-icon" />
-                  <div className="grow">
-                    <div className="share-record-title">{r.title}</div>
-                    {r.notes && <div className="muted share-record-notes">{r.notes}</div>}
-                  </div>
-                  <span className="muted share-record-date">{formatDate(r.date)}</span>
+            {vaccinations.length === 0 && <p className="muted hint-text">No vaccinations recorded yet.</p>}
+            {vaccinations.map((v) => {
+              const status = vaxStatus(v.nextDueDate);
+              return (
+                <div key={v._id} className="row gap-md vax-row">
+                  <span className={`vax-dot${status.watch ? ' watch' : ''}`} />
+                  <span className="share-record-title">{v.title}</span>
+                  <span className="muted status-label">{status.label}</span>
                 </div>
-              ))}
-            </div>
-
-            <div className="row gap-sm muted share-footer">
-              <span className="share-footer-badge">
-                <Icon name="pets" size={14} filled />
-              </span>
-              Shared via PetLog
-            </div>
+              );
+            })}
           </div>
+
+          <div className="share-section">
+            <div className="row gap-sm share-section-title-row">
+              <Icon name="clinical_notes" size={21} filled className="icon-brand" />
+              <span className="share-section-title">Recent records</span>
+            </div>
+            {others.length === 0 && <p className="muted hint-text">No other records yet.</p>}
+            {others.map((r) => (
+              <div key={r._id} className="row gap-md share-record-row">
+                <Icon name="event_note" size={19} className="muted share-record-icon" />
+                <div className="grow">
+                  <div className="share-record-title">{r.title}</div>
+                  {r.notes && <div className="muted share-record-notes">{r.notes}</div>}
+                </div>
+                <span className="muted share-record-date">{formatDate(r.date)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="share-cta-card">
+          <p className="muted share-cta-text">Keep every pet's health record organized — free for owners.</p>
+          <button className="btn btn-primary share-cta-btn" onClick={() => navigate('/login')}>
+            Get PetLog free
+          </button>
         </div>
       </div>
     </div>
