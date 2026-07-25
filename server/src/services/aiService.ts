@@ -10,7 +10,7 @@ Never make a definitive diagnosis. Always recommend professional veterinary care
 Respond ONLY with valid JSON — no markdown, no extra text.`;
 
 export const checkSymptoms = async (petId: string, ownerUid: string, symptoms: string) => {
-  const pet = await Pet.findById(petId)
+  const pet = await Pet.findById(petId);
   if (!pet) throw new AppError('Pet not found', 404);
   if (pet.owner !== ownerUid) throw new AppError('Forbidden', 403);
 

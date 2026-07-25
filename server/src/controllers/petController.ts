@@ -8,25 +8,25 @@ export const getMyPets = handleAsyncError(async (req, res) => {
 
 export const getPublicPet = handleAsyncError(async (req, res) => {
   const pet = await petService.getPublicPetByToken(req.params['token'] as string);
-  res.json({ success: true, data: pet });
+  res.json({ success: true, message: "Pet shared successfully", data: pet });
 });
 
 export const getPet = handleAsyncError(async (req, res) => {
   const pet = await petService.getPetById(req.params['id'] as string, req.user.uid);
-  res.json({ success: true, data: pet });
+  res.json({ success: true, message: "Pet fetched successfully", data: pet });
 });
 
 export const createPet = handleAsyncError(async (req, res) => {
   const pet = await petService.createPet(req.user.uid, req.body);
-  res.status(201).json({ success: true, data: pet });
+  res.status(201).json({ success: true, message: "Pet created successfully", data: pet });
 });
 
 export const updatePet = handleAsyncError(async (req, res) => {
   const pet = await petService.updatePet(req.params['id'] as string, req.user.uid, req.body);
-  res.json({ success: true, data: pet });
+  res.json({ success: true, message: "Pet updated successfully", data: pet });
 });
 
 export const deletePet = handleAsyncError(async (req, res) => {
   await petService.deletePet(req.params['id'] as string, req.user.uid);
-  res.json({ success: true, message: 'Pet deleted' });
+  res.json({ success: true, message: "Pet deleted successfully" });
 });

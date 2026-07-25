@@ -10,7 +10,7 @@ export const getRecords = handleAsyncError(async (req, res) => {
     page,
     limit,
   );
-  res.json({ success: true, ...result });
+  res.json({ success: true, message: "Health records fetched successfully", data: { ...result } });
 });
 
 export const createRecord = handleAsyncError(async (req, res) => {
@@ -19,7 +19,7 @@ export const createRecord = handleAsyncError(async (req, res) => {
     req.user.uid,
     req.body,
   );
-  res.status(201).json({ success: true, data: record });
+  res.status(201).json({ success: true, message: "Health record created successfully", data: record });
 });
 
 export const updateRecord = handleAsyncError(async (req, res) => {
@@ -29,7 +29,7 @@ export const updateRecord = handleAsyncError(async (req, res) => {
     req.user.uid,
     req.body,
   );
-  res.json({ success: true, data: record });
+  res.json({ success: true, message: "Health record updated successfully", data: record });
 });
 
 export const deleteRecord = handleAsyncError(async (req, res) => {
@@ -38,5 +38,5 @@ export const deleteRecord = handleAsyncError(async (req, res) => {
     req.params['rid'] as string,
     req.user.uid,
   );
-  res.json({ success: true, message: 'Record deleted' });
+  res.json({ success: true, message: "Health record deleted successfully" });
 });
