@@ -1,4 +1,5 @@
 import * as petService from '../services/petService.ts';
+import * as aiService from '../services/aiService.ts';
 import handleAsyncError from '../utils/handleAsyncError.ts';
 
 export const getMyPets = handleAsyncError(async (req, res) => {
@@ -29,4 +30,11 @@ export const updatePet = handleAsyncError(async (req, res) => {
 export const deletePet = handleAsyncError(async (req, res) => {
   await petService.deletePet(req.params['id'] as string, req.user.uid);
   res.json({ success: true, message: "Pet deleted successfully" });
+});
+
+export const symptomCheck = handleAsyncError(async (req, res) => {
+  const { symptoms } = req.body as { symptoms: string };
+  const { id: petId } = req.params as { id: string }
+  const result = await aiService.checkSymptoms(petId, req.user.uid, symptoms);
+  res.json({ success: true, message: 'Symptom check completed successfully', data: result });
 });
