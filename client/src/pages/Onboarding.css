@@ -49,10 +49,11 @@
   background: transparent;
   color: var(--text-body);
 }
+/* Selection reads through the edge, not a tinted fill. */
 .species-card.active {
   border: 2px solid var(--brand);
-  background: var(--brand-soft);
-  color: var(--md-sys-color-on-primary-container);
+  background: var(--md-sys-color-surface-container-low);
+  color: var(--text-body);
 }
 .badge-suggested {
   display: inline-flex;
@@ -74,21 +75,12 @@
   height: 38px;
   border-radius: 11px;
 }
-.tone-vax {
-  background: var(--md-sys-color-primary-container);
-  color: var(--md-sys-color-on-primary-container);
-}
-.tone-vet {
-  background: var(--md-sys-color-secondary-container);
-  color: var(--md-sys-color-on-secondary-container);
-}
-.tone-med {
-  background: var(--md-sys-color-tertiary-container);
-  color: var(--md-sys-color-on-tertiary-container);
-}
+.tone-vax,
+.tone-vet,
+.tone-med,
 .tone-wt {
-  background: var(--md-sys-color-surface-variant);
-  color: var(--md-sys-color-on-surface-variant);
+  background: var(--icon-container);
+  color: var(--on-icon-container);
 }
 .care-toggle-title {
   font-weight: 600;

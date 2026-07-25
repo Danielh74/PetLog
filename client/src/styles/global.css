@@ -46,6 +46,24 @@ a {
   text-decoration: none;
 }
 
+/* ---------- Focus (WCAG 2.4.7) ----------
+   One ring everywhere, on the keyboard path only so pointer users don't
+   see it. The offset keeps it legible on both filled and outlined controls. */
+:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+/* Controls that already own a radius keep their own silhouette. */
+.btn:focus-visible,
+.icon-btn:focus-visible,
+.pill:focus-visible,
+.pet-card:focus-visible,
+.field input:focus-visible,
+.field select:focus-visible {
+  border-radius: inherit;
+}
+
 @keyframes pl-fade {
   from {
     opacity: 0;
@@ -153,6 +171,10 @@ a {
 .icon-btn:hover {
   background: var(--md-sys-color-surface-container-high);
 }
+.icon-btn-sm {
+  width: 34px;
+  height: 34px;
+}
 .shell-topbar {
   border-bottom: 1px solid var(--border);
 }
@@ -193,10 +215,12 @@ a {
   color: var(--text-on-brand);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14);
 }
+/* Secondary action: neutral ink and a neutral edge. The brand fill above is
+   the only thing on a screen that reads as "the" action. */
 .btn-outline {
   background: transparent;
   border: 1px solid var(--border-strong);
-  color: var(--brand);
+  color: var(--text-body);
 }
 .btn-outline:hover:not(:disabled) {
   filter: none;
@@ -281,8 +305,8 @@ a {
 }
 .pill.active {
   border: 1px solid transparent;
-  background: var(--brand-soft);
-  color: var(--md-sys-color-on-primary-container);
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
 }
 .pill-row {
   display: flex;
@@ -297,8 +321,8 @@ a {
   display: grid;
   place-items: center;
   flex: none;
-  background: var(--brand-soft);
-  color: var(--md-sys-color-on-primary-container);
+  background: var(--icon-container);
+  color: var(--on-icon-container);
 }
 
 /* ---------- Bottom nav / Sidebar ---------- */

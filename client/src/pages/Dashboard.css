@@ -2,11 +2,18 @@
   height: 64px;
   padding: 0 32px;
 }
-.dash-title {
-  font-family: var(--pawly-font-display);
+/* Page heading lives in the content column, not the top bar, so it starts on
+   the same 32px gutter as every band below it. */
+.dash-section-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.dash-heading {
   font-size: 24px;
-  font-weight: 600;
-  white-space: nowrap;
+  line-height: 1.2;
+  margin-right: auto;
 }
 .search-wrap {
   display: flex;
@@ -58,8 +65,10 @@
   color: var(--status-healthy);
 }
 
+/* Spans the full content column so its left edge lines up with the pet grid
+   and the attention bar rather than sitting on a second, narrower axis. */
 .reminders-section {
-  max-width: 680px;
+  width: 100%;
 }
 .section-label {
   font-size: 16px;
@@ -105,25 +114,16 @@
   height: 52px;
   margin-bottom: 14px;
 }
-.species-dog {
-  background: var(--md-sys-color-primary-container);
-  color: var(--md-sys-color-on-primary-container);
-}
-.species-cat {
-  background: var(--md-sys-color-tertiary-container);
-  color: var(--md-sys-color-on-tertiary-container);
-}
-.species-bird {
-  background: var(--md-sys-color-secondary-container);
-  color: var(--md-sys-color-on-secondary-container);
-}
-.species-rabbit {
-  background: var(--md-sys-color-surface-variant);
-  color: var(--md-sys-color-on-surface-variant);
-}
+/* Species avatars share one neutral container — the glyph carries the
+   distinction, not a fill. Keeps brand tint exclusive to actions, and means
+   species is never communicated by colour alone (WCAG 1.4.1). */
+.species-dog,
+.species-cat,
+.species-bird,
+.species-rabbit,
 .species-other {
-  background: var(--brand-soft);
-  color: var(--md-sys-color-on-primary-container);
+  background: var(--icon-container);
+  color: var(--on-icon-container);
 }
 .pet-name {
   font-family: var(--pawly-font-display);
@@ -290,11 +290,15 @@
   color: var(--md-sys-color-on-error-container);
   margin-bottom: 9px;
 }
+/* Status fill, not brand — red is earned here. */
 .reminder-icon-alert {
   width: 40px;
   height: 40px;
   background: var(--md-sys-color-error);
   color: var(--md-sys-color-on-error);
+}
+.reminder-row-overdue .reminder-when {
+  color: var(--md-sys-color-on-error-container);
 }
 .reminder-row-upcoming {
   margin-bottom: 9px;

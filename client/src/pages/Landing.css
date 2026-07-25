@@ -91,8 +91,8 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  background: var(--brand-soft);
-  color: var(--md-sys-color-on-primary-container);
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
   padding: 7px 14px;
   border-radius: 999px;
   font-size: 13px;
@@ -254,19 +254,11 @@
   flex: none;
 }
 
-.landing-feature-icon.tone-fol {
-  background: var(--md-sys-color-primary-container);
-  color: var(--md-sys-color-on-primary-container);
-}
-
-.landing-feature-icon.tone-not {
-  background: var(--md-sys-color-secondary-container);
-  color: var(--md-sys-color-on-secondary-container);
-}
-
+.landing-feature-icon.tone-fol,
+.landing-feature-icon.tone-not,
 .landing-feature-icon.tone-aut {
-  background: var(--md-sys-color-tertiary-container);
-  color: var(--md-sys-color-on-tertiary-container);
+  background: var(--icon-container);
+  color: var(--on-icon-container);
 }
 
 .landing-steps {
@@ -287,8 +279,8 @@
   width: 34px;
   height: 34px;
   border-radius: 999px;
-  background: var(--brand);
-  color: var(--md-sys-color-on-primary);
+  background: var(--md-sys-color-secondary);
+  color: var(--md-sys-color-on-secondary);
   font-weight: 700;
   font-size: 15px;
   margin-bottom: 12px;
@@ -358,6 +350,13 @@
 
 .landing-cta-btn:hover {
   filter: brightness(0.96);
+}
+
+/* The default ring is dark teal, which disappears against the brand band —
+   invert it on the inverted surfaces. */
+.landing-cta-band :focus-visible,
+.landing-verdict-card :focus-visible {
+  outline-color: #fff;
 }
 
 .landing-footer {

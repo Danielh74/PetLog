@@ -58,7 +58,7 @@
 }
 .option-row.active {
   border: 2px solid var(--brand);
-  background: var(--brand-soft);
+  background: var(--md-sys-color-surface-container-low);
 }
 .option-check {
   margin-left: auto;

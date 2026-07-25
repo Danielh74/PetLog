@@ -79,7 +79,6 @@ const Dashboard = () => {
     <AppLayout>
       <div className="page">
         <div className="top-bar shell-topbar dash-topbar">
-          <span className="dash-title">My Pets</span>
           <span className="grow" />
           <div className="row gap-sm search-wrap">
             <Icon name="search" size={19} className="muted" />
@@ -107,16 +106,9 @@ const Dashboard = () => {
 
             {!loading && !error && (
               <>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                  <span style={{ fontFamily: 'var(--pawly-font-display)', fontSize: '24px', fontWeight: '600', color: 'var(--text-body)' }}>
-                    My Pets
-                  </span>
-                  <span style={{ flex: '1' }} />
-                  <button
-                    onClick={() => navigate('/pets/new')}
-                    className="btn btn-primary"
-                    style={{ height: '40px', padding: '0 16px', fontSize: '14px' }}
-                  >
+                <div className="dash-section-head">
+                  <h1 className="dash-heading">My Pets</h1>
+                  <button onClick={() => navigate('/pets/new')} className="btn btn-primary btn-sm">
                     <Icon name="add" size={19} />
                     Add pet
                   </button>
@@ -177,7 +169,6 @@ const Dashboard = () => {
                   <div className="selected-pet-detail">
                     <div className="selected-pet-header">
                       <span className="selected-pet-name">{selectedPet.name}</span>
-                      <span style={{ flex: '1' }} />
                       <div className="selected-pet-actions">
                         <button className="btn btn-outline btn-sm" onClick={() => navigate(`/pets/${selectedPet._id}`)}>
                           <Icon name="open_in_full" size={16} />
@@ -188,9 +179,9 @@ const Dashboard = () => {
                           Check
                         </button>
                         <button
-                          className="icon-btn"
+                          className="icon-btn icon-btn-sm"
                           onClick={() => navigate(`/share/${selectedPet.shareToken}`)}
-                          style={{ width: '34px', height: '34px' }}
+                          aria-label={`Share ${selectedPet.name}'s record`}
                         >
                           <Icon name="ios_share" size={18} />
                         </button>
@@ -231,15 +222,7 @@ const Dashboard = () => {
                     <>
                       {overdue.map((r) => (
                         <div key={r._id} className="row gap-md reminder-row-overdue">
-                          <span
-                            className={`avatar reminder-icon-alert ${reminderTone(r.title)}`}
-                            style={{
-                              width: '40px',
-                              height: '40px',
-                              background: 'var(--md-sys-color-error)',
-                              color: 'var(--md-sys-color-on-error)',
-                            }}
-                          >
+                          <span className={`avatar reminder-icon-alert ${reminderTone(r.title)}`}>
                             <Icon name="error" size={22} filled />
                           </span>
                           <div className="min-w-0">
@@ -248,9 +231,7 @@ const Dashboard = () => {
                             </div>
                             <div className="reminder-detail">Was due {new Date(r.dueDate).toLocaleDateString()}</div>
                           </div>
-                          <span className="reminder-when" style={{ color: 'var(--md-sys-color-on-error-container)' }}>
-                            {relativeDue(r.dueDate).label}
-                          </span>
+                          <span className="reminder-when">{relativeDue(r.dueDate).label}</span>
                         </div>
                       ))}
                     </>
@@ -260,15 +241,7 @@ const Dashboard = () => {
                     <>
                       {upcoming.map((r) => (
                         <div key={r._id} className="row gap-md card reminder-row-upcoming">
-                          <span
-                            className="avatar icon-avatar-sm"
-                            style={{
-                              width: '40px',
-                              height: '40px',
-                              background: 'var(--md-sys-color-primary-container)',
-                              color: 'var(--md-sys-color-on-primary-container)',
-                            }}
-                          >
+                          <span className="avatar icon-avatar-sm">
                             <Icon name={reminderIcon(r.title)} size={22} />
                           </span>
                           <div className="min-w-0">
