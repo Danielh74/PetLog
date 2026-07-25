@@ -1,0 +1,55 @@
+.focused-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 32px 20px;
+  background: var(--md-sys-color-surface-dim);
+}
+.focused-panel {
+  width: 560px;
+  flex: none;
+  min-height: 560px;
+  max-height: 80vh;
+  background: var(--md-sys-color-surface);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+.focused-aside {
+  display: block;
+  width: 260px;
+  flex: none;
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 22px 20px;
+  align-self: flex-start;
+}
+.focused-aside-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 12px;
+  color: var(--text-body);
+}
+.focused-aside-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 14px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text-body);
+}
+.focused-aside-item:last-child {
+  margin-bottom: 0;
+}
+.focused-aside-icon {
+  color: var(--brand);
+  flex: none;
+  margin-top: 1px;
+}
