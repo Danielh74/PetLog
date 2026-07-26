@@ -79,14 +79,6 @@ a {
     transform: rotate(360deg);
   }
 }
-@keyframes pl-sheet {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: none;
-  }
-}
 @keyframes pl-pop {
   from {
     opacity: 0;
@@ -464,50 +456,28 @@ a {
   background: rgba(0, 0, 0, 0.45);
   z-index: 20;
 }
+/* Centred at every width. This used to become a bottom sheet under 860px,
+   which put the form against the edge of the screen and, on a short viewport,
+   pushed its first fields off the top. One centred dialog everywhere is both
+   easier to reach and easier to reason about.
+
+   dvh, not vh: mobile browser chrome collapses and vh does not follow it, so
+   a vh cap can leave the dialog taller than the space actually on screen. */
 .sheet {
   position: fixed;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 420px;
-  max-width: 92vw;
-  max-height: 80vh;
+  width: min(420px, calc(100vw - 32px));
+  max-height: min(85dvh, 720px);
   overflow-y: auto;
+  overscroll-behavior: contain;
   background: var(--md-sys-color-surface-container-high);
   border-radius: 20px;
   padding: 18px 16px 20px;
   animation: pl-pop 0.18s both;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
   z-index: 21;
-}
-.sheet-handle {
-  display: none;
-}
-@media (max-width: 859px) {
-  .sheet {
-    left: 50%;
-    top: auto;
-    bottom: 0;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 460px;
-    /* Not `none`: anchored to the bottom, an unbounded sheet grows past the
-       top of the screen and the first fields become unreachable. dvh so the
-       mobile browser chrome collapsing doesn't clip it either. */
-    max-height: 88dvh;
-    border-radius: 28px 28px 0 0;
-    padding: 10px 14px calc(22px + env(safe-area-inset-bottom));
-    animation: pl-sheet 0.26s both;
-    box-shadow: none;
-  }
-  .sheet-handle {
-    display: block;
-    width: 34px;
-    height: 4px;
-    border-radius: 999px;
-    background: var(--border-strong);
-    margin: 0 auto 10px;
-  }
 }
 .sheet-title {
   font-family: var(--pawly-font-display);
@@ -533,18 +503,22 @@ a {
 }
 
 /* ---------- Confirm dialog ---------- */
+/* Same centring and the same sizing formula as .sheet, so Delete and Edit
+   land in the same place rather than at two slightly different widths. */
 .confirm-dialog {
   position: fixed;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: calc(100% - 48px);
-  max-width: 360px;
+  width: min(380px, calc(100vw - 32px));
+  max-height: min(85dvh, 720px);
+  overflow-y: auto;
   background: var(--md-sys-color-surface-container-high);
   border-radius: 20px;
   padding: 22px 20px 20px;
   z-index: 21;
-  animation: pl-fade 0.18s both;
+  animation: pl-pop 0.18s both;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
 }
 .confirm-title {
   font-size: 18px;

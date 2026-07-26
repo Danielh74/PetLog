@@ -528,7 +528,6 @@ const PetProfile = () => {
           <Portal lockScroll>
             <div className="sheet-scrim" onClick={closeSheet} />
             <div className="sheet" role="dialog" aria-modal="true" aria-label="Add a record">
-              <div className="sheet-handle" />
               {!chosenType ? (
                 <>
                   <div className="sheet-title">Add a record</div>
@@ -556,7 +555,6 @@ const PetProfile = () => {
           <Portal lockScroll>
             <div className="sheet-scrim" onClick={() => setEditOpen(false)} />
             <div className="sheet" role="dialog" aria-modal="true" aria-label={`Edit ${pet.name}`}>
-              <div className="sheet-handle" />
               {sheetError && <p className="sheet-error">{sheetError}</p>}
               <EditPetForm pet={pet} onCancel={() => setEditOpen(false)} onSaved={handleUpdatePet} />
             </div>
