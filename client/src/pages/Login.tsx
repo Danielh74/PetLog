@@ -124,7 +124,7 @@ const Login = () => {
             <span className="grow divider-line" />
           </div>
 
-          <button className="btn btn-outline auth-submit" onClick={handleGoogle} disabled={busy}>
+          <button className="btn btn-outline auth-submit auth-google" onClick={handleGoogle} disabled={busy}>
             <Icon name="login" size={19} />
             Continue with Google
           </button>

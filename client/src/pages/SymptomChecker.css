@@ -1,9 +1,6 @@
 .checker-body {
   padding: 6px 20px 24px;
 }
-.intro-wrap {
-  padding-top: 14px;
-}
 .spinner-gap {
   margin-bottom: 22px;
 }
@@ -12,12 +9,6 @@
   font-size: 11.5px;
   font-weight: 700;
   padding-right: 14px;
-}
-.intro-avatar {
-  width: 72px;
-  height: 72px;
-  border-radius: 24px;
-  margin-bottom: 16px;
 }
 .intro-title {
   font-size: 24px;
@@ -218,6 +209,13 @@
   text-align: center;
   margin: 18px 8px 0;
   line-height: 1.4;
+}
+.describe-submit {
+  width: 100%;
+  margin-bottom: 16px;
+}
+.checker-footer.hidden {
+  display: none;
 }
 .checker-footer {
   padding: 12px 20px 18px;

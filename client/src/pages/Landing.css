@@ -131,64 +131,90 @@
   flex: 0 1 auto;
 }
 
+/* Plain container. It used to be a filled brand gradient, which is what made
+   this half of the hero shout louder than the buttons on the other half.
+   Stretch so the card shares both edges with the column opposite: its top
+   meets the chip, its bottom meets the CTA row (which sits on margin-top:auto). */
 .landing-hero-right {
-  background: linear-gradient(150deg, var(--brand), color-mix(in srgb, var(--brand) 68%, #000));
-  border-radius: 22px;
-  padding: 22px;
-  color: #fff;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.16);
+  display: flex;
+  align-items: stretch;
 }
 
-.landing-verdict-card {
+/* ---------- Hero preview ----------
+   A quiet, outlined sample of a record. The previous card was a filled brand
+   panel carrying its own urgency headline, which competed with the hero CTAs
+   for the same attention. Brand fill stays with the buttons. */
+.landing-preview {
+  width: 100%;
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
 }
 
-.landing-card-row {
-  background: rgba(255, 255, 255, 0.13);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 12px;
-  padding: 13px;
+.landing-preview-head {
   display: flex;
   align-items: center;
   gap: 11px;
-  font-size: 14px;
+  flex: none;
+  padding-bottom: 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border);
 }
 
-.landing-card-row.alert {
-  background: #fff;
-  color: #7c241a;
-  border: none;
-  font-weight: 600;
+.landing-preview-avatar {
+  width: 40px;
+  height: 40px;
 }
 
-.landing-urgency {
-  background: #fff;
-  color: var(--text-body);
-  border-radius: 12px;
-  padding: 15px;
-  margin-top: 4px;
-}
-
-.landing-urgency-tag {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--status-watch);
-}
-
-.landing-urgency-headline {
+.landing-preview-name {
   font-family: var(--pawly-font-display);
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 600;
-  margin: 4px 0 3px;
+  color: var(--text-body);
 }
 
-.landing-urgency-body {
+.landing-preview-meta {
   font-size: 13px;
   color: var(--text-muted);
+}
+
+/* The rows absorb the extra height rather than the gaps between them, so a
+   taller card reads as generous rows instead of drifting apart. */
+.landing-preview-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex: 1;
+  min-height: 46px;
+  padding: 11px 13px;
+  border-radius: 12px;
+  background: var(--md-sys-color-surface);
+  border: 1px solid var(--border);
+  font-size: 14px;
+  color: var(--text-body);
+}
+
+.landing-preview-row.overdue {
+  background: var(--md-sys-color-error-container);
+  color: var(--md-sys-color-on-error-container);
+  border-color: transparent;
+  font-weight: 600;
+}
+
+.landing-preview-icon {
+  color: var(--text-muted);
+}
+
+.landing-preview-when {
+  margin-left: auto;
+  font-size: 12.5px;
+  white-space: nowrap;
+  opacity: 0.85;
 }
 
 .landing-section {
@@ -261,16 +287,22 @@
   color: var(--on-icon-container);
 }
 
+/* Same track and same card as .landing-features above, so the two sections
+   share one set of column edges. They used to differ (260 vs 280px track,
+   20 vs 22px padding, no background) and read as two separate layouts. */
 .landing-steps {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 16px;
 }
 
 .landing-step-card {
-  padding: 20px;
-  border-radius: 18px;
+  background: var(--surface-card);
   border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
 }
 
 .landing-step-number {
@@ -298,22 +330,6 @@
   margin: 0;
   font-size: 14px;
   color: var(--text-muted);
-}
-
-.landing-trust {
-  display: flex;
-  gap: 12px;
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 20px 32px 46px;
-  background: var(--md-sys-color-surface-container-high);
-  border-radius: 18px;
-  font-size: 14px;
-  color: var(--text-muted);
-}
-
-.landing-trust span {
-  flex: 1;
 }
 
 .landing-cta-band {
@@ -354,15 +370,16 @@
 
 /* The default ring is dark teal, which disappears against the brand band —
    invert it on the inverted surfaces. */
-.landing-cta-band :focus-visible,
-.landing-verdict-card :focus-visible {
+.landing-cta-band :focus-visible {
   outline-color: #fff;
 }
 
+/* The footer is the page's base, so it meets the CTA band with real breathing
+   room instead of the 10px sliver that read as a mistake. */
 .landing-footer {
   border-top: 1px solid var(--border);
   background: var(--md-sys-color-surface-container-low);
-  margin-top: 10px;
+  margin-top: 56px;
 }
 
 .landing-footer-content {
@@ -447,10 +464,6 @@
     margin-left: 24px;
     margin-right: 24px;
   }
-  .landing-trust {
-    margin-left: 24px;
-    margin-right: 24px;
-  }
   .landing-footer-content {
     padding: 30px 24px;
   }
@@ -509,10 +522,6 @@
   }
   .landing-cta-band h2 {
     font-size: 22px;
-  }
-  .landing-trust {
-    margin-left: 16px;
-    margin-right: 16px;
   }
   .landing-footer-content {
     padding: 26px 16px;

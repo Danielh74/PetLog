@@ -128,6 +128,17 @@ const SymptomChecker = () => {
                   </span>
                 </div>
 
+                {/* Directly under the field it submits — not in a footer bar,
+                    where a narrow screen squeezed it to a stub. */}
+                <button
+                  className="btn btn-primary describe-submit"
+                  onClick={() => void runCheck()}
+                  disabled={!canSubmit}
+                >
+                  Check symptoms
+                  <Icon name="arrow_forward" size={19} />
+                </button>
+
                 <div className="describe-prompts">
                   <span className="describe-prompts-title">Helpful to mention</span>
                   <ul>
@@ -200,12 +211,9 @@ const SymptomChecker = () => {
           </div>
         </div>
 
-        <div className="checker-footer">
-          {step === 'intro' && (
-            <button className="btn btn-primary" onClick={() => void runCheck()} disabled={!canSubmit}>
-              Check symptoms
-            </button>
-          )}
+        {/* Only the terminal steps need a footer now; the describe step carries
+            its own submit, so an empty bar no longer sits under the form. */}
+        <div className={`checker-footer${step === 'intro' ? ' hidden' : ''}`}>
           {step === 'error' && (
             <button className="btn btn-primary" onClick={() => setStep('intro')}>
               <Icon name="refresh" size={18} />

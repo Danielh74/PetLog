@@ -1,17 +1,19 @@
 .focused-wrap {
   min-height: 100vh;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   gap: 20px;
   padding: 32px 20px;
   background: var(--md-sys-color-surface-dim);
 }
+/* No fixed height cap on desktop: an 80vh ceiling forced the checker to
+   scroll inside its own panel even when the window had room. The panel now
+   grows with its content and only scrolls once it genuinely exceeds the
+   viewport. */
 .focused-panel {
   width: 560px;
   flex: none;
-  min-height: 560px;
-  max-height: 80vh;
   background: var(--md-sys-color-surface);
   display: flex;
   flex-direction: column;
@@ -96,4 +98,14 @@
     border-right: none;
     border-bottom: none;
   }
+}
+
+/* Inside a panel that now sizes to its content, the page's generic
+   scroll-area must not claim its own scrollbar — the content is already
+   fully visible. It regains one only if the panel hits the viewport cap. */
+.focused-panel .scroll-area {
+  overflow-y: visible;
+}
+.focused-panel .page {
+  min-height: 0;
 }

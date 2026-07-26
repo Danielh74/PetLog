@@ -177,11 +177,37 @@
   --status-watch: #7a4f00; /* 6.8:1 on --surface */
   --status-alert: var(--md-sys-color-error); /* 6.1:1 on --surface */
 
-  /* Neutral container for decorative icons — species avatars, record-type
-     glyphs, feature marks. Deliberately not primary: brand fills are
-     reserved for calls to action so they keep their hierarchy. */
+  /* Neutral container for decorative icons where no category applies. */
   --icon-container: var(--md-sys-color-surface-container-highest);
   --on-icon-container: var(--md-sys-color-on-surface-variant);
+
+  /* ---------- Category tints ----------
+     Species and record types get their own hue so a list is scannable. Every
+     one is a pale wash carrying dark ink, never a saturated fill: a filled
+     button is the only thing on screen at full chroma, so these read as
+     labelling rather than as something to click. Each ink clears 4.5:1 on its
+     own tint. Colour is always paired with an icon — never the only signal. */
+  --tint-dog: #e8f0fe;
+  --tint-dog-ink: #14477d;
+  --tint-cat: #fdeceb;
+  --tint-cat-ink: #8a2f22;
+  --tint-bird: #fff4e0;
+  --tint-bird-ink: #7a4f00;
+  --tint-rabbit: #f0eafc;
+  --tint-rabbit-ink: #4b2d7f;
+  --tint-other: #e9f2ef;
+  --tint-other-ink: #2b4a42;
+
+  --tint-vax: #e4f2ec;
+  --tint-vax-ink: #14503c;
+  --tint-vet: #e8f0fe;
+  --tint-vet-ink: #14477d;
+  --tint-med: #f0eafc;
+  --tint-med-ink: #4b2d7f;
+  --tint-weight: #fff4e0;
+  --tint-weight-ink: #7a4f00;
+  --tint-groom: #fdeceb;
+  --tint-groom-ink: #8a2f22;
 
   /* Focus ring — same in every context so keyboard users learn one signal. */
   --focus-ring: var(--md-ref-primary-30);

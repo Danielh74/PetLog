@@ -263,6 +263,12 @@ a {
   background: var(--md-sys-color-surface);
   color: var(--text-body);
 }
+/* Browsers default placeholders to a grey that lands near 4:1. Pinning it to
+   --text-muted keeps hint text readable rather than merely present. */
+.field input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.75;
+}
 .field input:focus {
   border: 2px solid var(--brand);
   outline: none;
@@ -291,96 +297,6 @@ a {
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 16px;
-}
-
-/* ---------- Responsive ----------
-   Desktop-first: the rules above are the wide layout, and these narrow it.
-   Breakpoints match the ones already used by PetProfile/Reminders/Login so
-   the whole app turns at the same width.
-     ≤859px  — sidebar becomes a bottom bar, single column
-     ≤599px  — phone: tighter gutters, stacked rows                       */
-
-@media (max-width: 859px) {
-  .app-layout {
-    flex-direction: column;
-  }
-
-  /* Sidebar → bottom bar. Fixed so it survives the page's own scroll area,
-     and padded for the iOS home indicator. */
-  .app-layout .bottom-nav {
-    order: 1;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    top: auto;
-    z-index: 10;
-    flex-direction: row;
-    width: 100%;
-    height: auto;
-    padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
-    gap: 4px;
-    justify-content: space-around;
-    border-right: none;
-    border-top: 1px solid var(--border);
-    background: var(--md-sys-color-surface-container-low);
-  }
-  /* The wordmark and the account chip are sidebar furniture — the bottom bar
-     is only for destinations. Account is still reachable via its tab. */
-  .bottom-nav .nav-brand,
-  .bottom-nav .nav-user-chip,
-  .bottom-nav .nav-spacer {
-    display: none;
-  }
-  .bottom-nav a,
-  .bottom-nav button {
-    flex: 1;
-    flex-direction: column;
-    justify-content: center;
-    gap: 3px;
-    padding: 7px 4px;
-    margin-bottom: 0;
-    font-size: 11px;
-    min-height: 52px;
-    text-align: center;
-  }
-
-  /* Clear the fixed bar so the last row of content is never trapped under it. */
-  .app-layout .app-main {
-    padding-bottom: calc(64px + env(safe-area-inset-bottom));
-  }
-
-  .page-pad {
-    padding: 20px 16px 32px;
-  }
-  .top-bar {
-    padding: 0 16px;
-    gap: 10px;
-  }
-  .confirm-actions .btn {
-    flex: 1;
-  }
-}
-
-@media (max-width: 599px) {
-  .page-pad {
-    padding: 16px 14px 28px;
-  }
-  .top-bar {
-    padding: 0 14px;
-    gap: 8px;
-  }
-  .field-row {
-    flex-direction: column;
-    gap: 0;
-  }
-  /* Full-bleed actions read as tappable targets on a phone. */
-  .confirm-actions {
-    flex-direction: column-reverse;
-  }
-  .confirm-actions .btn {
-    width: 100%;
-  }
 }
 
 /* ---------- Pills / chips ---------- */
@@ -492,13 +408,36 @@ a {
   display: block;
   flex: 1;
 }
-.nav-user-chip {
+/* The chip is the account entry point on desktop, so it has to look and
+   behave like one — it was a plain div that read as clickable and wasn't. */
+.bottom-nav .nav-user-chip {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 12px 10px;
+  margin-bottom: 0;
   border-radius: 12px;
   background: var(--md-sys-color-surface-container);
+  cursor: pointer;
+  color: var(--text-body);
+  transition: background 0.15s ease;
+}
+.bottom-nav .nav-user-chip:hover {
+  background: var(--md-sys-color-surface-container-highest);
+}
+.bottom-nav .nav-user-chip.active {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+.nav-user-chevron {
+  margin-left: auto;
+  flex: none;
+  opacity: 0.5;
+}
+/* Only the narrow layout needs the tab; the chip covers it above.
+   Scoped to .bottom-nav so it outweighs the `.bottom-nav a` display rule. */
+.bottom-nav .nav-account-tab {
+  display: none;
 }
 .nav-user-avatar {
   width: 34px;
@@ -516,12 +455,6 @@ a {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-/* ---------- FAB — desktop-only app, FABs not used ---------- */
-.fab,
-.fab-round {
-  display: none;
 }
 
 /* ---------- Sheet / modal — centered dialog on desktop, bottom sheet on mobile ---------- */
@@ -558,9 +491,12 @@ a {
     transform: translateX(-50%);
     width: 100%;
     max-width: 460px;
-    max-height: none;
+    /* Not `none`: anchored to the bottom, an unbounded sheet grows past the
+       top of the screen and the first fields become unreachable. dvh so the
+       mobile browser chrome collapsing doesn't clip it either. */
+    max-height: 88dvh;
     border-radius: 28px 28px 0 0;
-    padding: 10px 14px 22px;
+    padding: 10px 14px calc(22px + env(safe-area-inset-bottom));
     animation: pl-sheet 0.26s both;
     box-shadow: none;
   }
@@ -594,48 +530,6 @@ a {
 .sheet-row:hover {
   background: var(--md-sys-color-surface-container-highest);
   border-radius: 12px;
-}
-
-/* ---------- Popover menu ---------- */
-.menu-anchor {
-  position: relative;
-}
-.menu-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 14;
-}
-.menu-popover {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 6px;
-  background: var(--md-sys-color-surface-container-high);
-  border-radius: 14px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  padding: 6px;
-  min-width: 180px;
-  z-index: 15;
-}
-.menu-item {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border: none;
-  background: transparent;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 14px;
-  font-family: var(--pawly-font-body);
-  color: var(--text-body);
-}
-.menu-item:hover {
-  background: var(--md-sys-color-surface-container-highest);
-}
-.menu-item.danger {
-  color: var(--md-sys-color-error);
 }
 
 /* ---------- Confirm dialog ---------- */
@@ -675,7 +569,7 @@ a {
   position: fixed;
   left: 50%;
   transform: translateX(-50%);
-  bottom: 22px;
+  top: calc(14px + env(safe-area-inset-top));
   width: calc(100% - 32px);
   max-width: 428px;
   background: var(--md-sys-color-inverse-surface);
@@ -748,10 +642,119 @@ a {
 .ml-auto {
   margin-left: auto;
 }
-.fill-center {
-  justify-content: center;
-  flex: 1;
-}
 .icon-inverse-brand {
   color: var(--md-sys-color-inverse-primary);
+}
+
+/* Destructive secondary action: red ink on a neutral edge, so it is legible
+   as dangerous without carrying the visual weight of a filled button. */
+.btn-danger-outline {
+  color: var(--md-sys-color-error);
+}
+.btn-danger-outline:hover:not(:disabled) {
+  background: var(--md-sys-color-error-container);
+  border-color: var(--md-sys-color-error);
+}
+
+/* ---------- Responsive ----------
+   Desktop-first: the rules above are the wide layout, and these narrow it.
+   Breakpoints match the ones already used by PetProfile/Reminders/Login so
+   the whole app turns at the same width.
+     ≤859px  — sidebar becomes a bottom bar, single column
+     ≤599px  — phone: tighter gutters, stacked rows                       */
+
+@media (max-width: 859px) {
+  .app-layout {
+    flex-direction: column;
+  }
+
+  /* Sidebar → bottom bar. Fixed so it survives the page's own scroll area,
+     and padded for the iOS home indicator. */
+  .app-layout .bottom-nav {
+    order: 1;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    z-index: 10;
+    flex-direction: row;
+    width: 100%;
+    height: auto;
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+    gap: 4px;
+    justify-content: space-around;
+    border-right: none;
+    border-top: 1px solid var(--border);
+    background: var(--md-sys-color-surface-container-low);
+  }
+  /* The wordmark and the account chip are sidebar furniture — the bottom bar
+     is only for destinations, so Account reverts to a tab here. */
+  .bottom-nav .nav-brand,
+  .bottom-nav .nav-user-chip,
+  .bottom-nav .nav-spacer {
+    display: none;
+  }
+  .bottom-nav .nav-account-tab {
+    display: flex;
+  }
+  .bottom-nav a,
+  .bottom-nav button {
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    padding: 7px 4px;
+    margin-bottom: 0;
+    font-size: 11px;
+    min-height: 52px;
+    text-align: center;
+  }
+
+  /* Clear the fixed bar so the last row of content is never trapped under it. */
+  .app-layout .app-main {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+
+  .page-pad {
+    padding: 20px 16px 32px;
+  }
+  .top-bar {
+    padding: 0 16px;
+    gap: 10px;
+  }
+  .confirm-actions .btn {
+    flex: 1;
+  }
+}
+
+@media (max-width: 599px) {
+  .page-pad {
+    padding: 16px 14px 28px;
+  }
+  .top-bar {
+    padding: 0 14px;
+    gap: 8px;
+  }
+  /* 44px is the comfortable thumb target; 38px clears the WCAG minimum but
+     is tight for the tick buttons sitting at the end of a reminder row. */
+  .icon-btn {
+    width: 44px;
+    height: 44px;
+  }
+  .icon-btn-sm {
+    width: 40px;
+    height: 40px;
+  }
+  .field-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  /* Full-bleed actions read as tappable targets on a phone. */
+  .confirm-actions {
+    flex-direction: column-reverse;
+  }
+  .confirm-actions .btn {
+    width: 100%;
+  }
 }
