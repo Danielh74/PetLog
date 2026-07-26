@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -10,19 +10,8 @@ import {
 } from 'firebase/auth';
 import { auth, googleProvider } from '../config/firebase.ts';
 import { syncMe } from '../api/auth.ts';
+import { AuthContext } from './authContextValue.ts';
 import type { AppUser } from '../types/index.ts';
-
-interface AuthState {
-  firebaseUser: FirebaseUser | null;
-  appUser: AppUser | null;
-  loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
-  loginWithGoogle: () => Promise<void>;
-  logout: () => Promise<void>;
-}
-
-const AuthContext = createContext<AuthState | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
@@ -71,10 +60,4 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = (): AuthState => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
-  return ctx;
 };
