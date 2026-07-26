@@ -89,6 +89,35 @@ a {
     transform: none;
   }
 }
+/* Centred dialogs need their own keyframes.
+   pl-pop ends on `transform: none`, and with fill-mode `both` that end state
+   persists — overriding the translate(-50%, -50%) that does the centring. The
+   dialog snapped so its top-left corner sat at the middle of the screen, which
+   left half of it outside the viewport. Every frame here carries the centring
+   translate, so it is never dropped. */
+@keyframes pl-dialog {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -46%) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+/* Same trap as pl-dialog: the toast is centred with translateX(-50%), which
+   pl-fade's `transform: none` end state was wiping — leaving it offset by
+   half its own width. */
+@keyframes pl-toast {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
@@ -475,7 +504,7 @@ a {
   background: var(--md-sys-color-surface-container-high);
   border-radius: 20px;
   padding: 18px 16px 20px;
-  animation: pl-pop 0.18s both;
+  animation: pl-dialog 0.18s both;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
   z-index: 21;
 }
@@ -517,7 +546,7 @@ a {
   border-radius: 20px;
   padding: 22px 20px 20px;
   z-index: 21;
-  animation: pl-pop 0.18s both;
+  animation: pl-dialog 0.18s both;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
 }
 .confirm-title {
@@ -553,7 +582,7 @@ a {
   font-size: 14px;
   font-weight: 500;
   z-index: 30;
-  animation: pl-fade 0.2s both;
+  animation: pl-toast 0.2s both;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
   display: flex;
   align-items: center;
