@@ -122,3 +122,14 @@
   background: var(--md-sys-color-surface);
   border-top: 1px solid var(--border);
 }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 599px) {
+  .species-card {
+    min-height: 92px;
+  }
+  .care-toggle-icon {
+    width: 34px;
+    height: 34px;
+  }
+}

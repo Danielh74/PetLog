@@ -428,3 +428,104 @@
   flex-wrap: wrap;
   gap: 10px;
 }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 899px) {
+  .landing-hero {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 44px 24px 36px;
+  }
+  .landing-header {
+    padding: 0 24px;
+  }
+  .landing-section {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+  .landing-cta-band {
+    margin-left: 24px;
+    margin-right: 24px;
+  }
+  .landing-trust {
+    margin-left: 24px;
+    margin-right: 24px;
+  }
+  .landing-footer-content {
+    padding: 30px 24px;
+  }
+}
+
+@media (max-width: 599px) {
+  .landing-header {
+    padding: 0 16px;
+    gap: 10px;
+  }
+  /* Both actions stay: hiding "Log in" would leave a returning user with no
+     obvious way back into their account. Tighten them instead. */
+  .landing-actions {
+    gap: 4px;
+  }
+  .landing-actions .btn-text {
+    padding: 0 10px;
+    font-size: 13.5px;
+  }
+  .landing-actions .btn {
+    padding: 0 14px;
+    font-size: 13.5px;
+  }
+  .landing-wordmark {
+    font-size: 18px;
+  }
+  .landing-hero {
+    padding: 32px 16px 28px;
+    gap: 26px;
+  }
+  .landing-headline {
+    font-size: 32px;
+  }
+  .landing-subtext {
+    font-size: 15px;
+  }
+  /* Stacked full-width CTAs beat two half-width buttons on a narrow screen. */
+  .landing-ctas {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .landing-ctas .btn {
+    width: 100%;
+  }
+  .landing-section {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .landing-section-header h2 {
+    font-size: 24px;
+  }
+  .landing-cta-band {
+    margin-left: 16px;
+    margin-right: 16px;
+    padding: 32px 20px;
+  }
+  .landing-cta-band h2 {
+    font-size: 22px;
+  }
+  .landing-trust {
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+  .landing-footer-content {
+    padding: 26px 16px;
+    gap: 22px 18px;
+  }
+  /* Two columns of links instead of four cramped ones. */
+  .landing-footer-col {
+    flex: 1 1 40%;
+    min-width: 0;
+  }
+  .landing-footer-bottom {
+    padding-left: 16px;
+    padding-right: 16px;
+    flex-wrap: wrap;
+  }
+}

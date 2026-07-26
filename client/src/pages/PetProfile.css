@@ -219,3 +219,26 @@
   font-weight: 600;
   font-size: 15px;
 }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 599px) {
+  .profile-avatar {
+    width: 58px;
+    height: 58px;
+  }
+  .profile-name {
+    font-size: 21px;
+  }
+  /* Three stat cards at 320px leave ~90px each — stack to two rows instead. */
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .weight-bars {
+    height: 70px;
+    gap: 6px;
+  }
+  .record-icon {
+    width: 34px;
+    height: 34px;
+  }
+}

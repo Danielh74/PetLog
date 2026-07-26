@@ -157,3 +157,46 @@
 .hint-text {
   font-size: 13px;
 }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 859px) {
+  /* minmax(300px, …) overflows a 320px viewport once padding is counted;
+     min() lets the track collapse instead of pushing the page sideways. */
+  .share-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  }
+  .share-wrap {
+    padding: 24px 16px 60px;
+  }
+}
+
+@media (max-width: 599px) {
+  .share-wrap {
+    padding: 16px 14px 48px;
+  }
+  .share-hero {
+    padding: 20px;
+  }
+  .share-avatar {
+    width: 58px;
+    height: 58px;
+  }
+  .share-name {
+    font-size: 22px;
+  }
+  .share-section {
+    padding: 16px;
+  }
+  .share-topline {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  /* Dates were pinned nowrap against the title; give them their own line. */
+  .share-record-row {
+    flex-wrap: wrap;
+  }
+  .share-record-date {
+    width: 100%;
+    margin-left: 30px;
+  }
+}

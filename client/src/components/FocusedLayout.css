@@ -53,3 +53,47 @@
   flex: none;
   margin-top: 1px;
 }
+
+/* Below the desktop breakpoint the panel and its aside stack. The panel drops
+   its fixed width and height caps so the flow can use the whole screen —
+   otherwise a 560px panel with an 80vh ceiling clips its own footer button. */
+@media (max-width: 899px) {
+  .focused-wrap {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 20px 16px;
+    gap: 16px;
+  }
+  .focused-panel {
+    width: 100%;
+    min-height: 0;
+    max-height: none;
+  }
+  .focused-aside {
+    width: 100%;
+    align-self: stretch;
+  }
+}
+
+@media (max-width: 599px) {
+  /* Edge-to-edge on a phone: the card framing costs more than it gives. */
+  .focused-wrap {
+    padding: 0;
+    gap: 0;
+    background: var(--md-sys-color-surface);
+    min-height: 100dvh;
+  }
+  .focused-panel {
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    min-height: 100dvh;
+  }
+  .focused-aside {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+  }
+}

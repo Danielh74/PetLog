@@ -39,41 +39,94 @@
   font-size: 13px;
   line-height: 1.4;
 }
-.question-title {
-  font-size: 22px;
-  margin: 8px 0 18px;
+/* ---------- Describe step ----------
+   One free-text field. The old three-question funnel could only ever send
+   the AI a sentence assembled from fixed choices, so what the owner actually
+   noticed never reached it. */
+.describe-wrap {
+  padding-top: 10px;
 }
-.option-row {
+.describe-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.describe-input {
   width: 100%;
-  text-align: left;
-  padding: 15px 16px;
-  border-radius: 14px;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  font-family: var(--pawly-font-body);
+  resize: vertical;
+  min-height: 150px;
   border: 1px solid var(--border-strong);
-  background: transparent;
+  border-radius: 12px;
+  padding: 13px 14px;
+  font-family: var(--pawly-font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  background: var(--md-sys-color-surface);
   color: var(--text-body);
 }
-.option-row.active {
+.describe-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.85;
+}
+.describe-input:focus {
   border: 2px solid var(--brand);
-  background: var(--md-sys-color-surface-container-low);
+  outline: none;
+  padding: 12px 13px;
 }
-.option-check {
-  margin-left: auto;
-  width: 22px;
-  height: 22px;
-  border-radius: 999px;
-  display: grid;
-  place-items: center;
-  background: transparent;
-  color: var(--md-sys-color-on-primary);
-  opacity: 0;
+.describe-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 7px 2px 16px;
+  font-size: 12.5px;
 }
-.option-check.active {
-  background: var(--brand);
-  opacity: 1;
+.describe-help {
+  flex: 1;
+}
+.describe-count {
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+.describe-prompts {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 13px 15px;
+  margin-bottom: 16px;
+  background: var(--surface-card);
+}
+.describe-prompts-title {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 7px;
+}
+.describe-prompts ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text-body);
+}
+.described-recap {
+  margin-top: 18px;
+  padding: 13px 15px;
+  border-left: 3px solid var(--border-strong);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.described-recap-label {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 4px;
 }
 .loading-wrap {
   padding-top: 60px;
@@ -170,4 +223,36 @@
   padding: 12px 20px 18px;
   background: var(--md-sys-color-surface);
   border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+}
+/* The error step offers a retry alongside the way out, so the footer has to
+   hold two buttons without them colliding. */
+.checker-footer .btn {
+  flex: 1;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 599px) {
+  .checker-body {
+    padding: 6px 16px 24px;
+  }
+  .checker-footer {
+    padding: 12px 16px calc(14px + env(safe-area-inset-bottom));
+    flex-direction: column-reverse;
+  }
+  .intro-title {
+    font-size: 21px;
+  }
+  .describe-input {
+    min-height: 130px;
+    /* 16px keeps iOS Safari from zooming the viewport on focus. */
+    font-size: 16px;
+  }
+  .verdict-card {
+    padding: 18px 16px;
+  }
+  .verdict-headline {
+    font-size: 21px;
+  }
 }

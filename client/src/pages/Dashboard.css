@@ -326,7 +326,101 @@
 .spinner-wrap {
   padding: 60px 0;
 }
+
+/* Failure needs a way out. The old copy said "pull down to try again", which
+   is a gesture this desktop app does not have. */
+.load-error {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface-card);
+}
+.load-error-icon {
+  width: 46px;
+  height: 46px;
+}
+.load-error-copy {
+  flex: 1;
+  min-width: 0;
+}
+.load-error-title {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+.load-error-body {
+  font-size: 13.5px;
+  line-height: 1.45;
+}
 .empty-reminders {
   font-size: 14px;
   margin: 0 4px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 859px) {
+  /* .dash-topbar is loaded after global.css, so its 32px gutter would win
+     over the responsive .top-bar rule without this. */
+  .dash-topbar {
+    padding: 0 16px;
+  }
+  /* min() keeps the track from demanding more width than the screen has,
+     which is what forces a horizontal scrollbar on small phones. */
+  .pets-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(180px, 100%), 1fr));
+    gap: 12px;
+  }
+  .search-wrap {
+    flex: 1 1 auto;
+    width: auto;
+  }
+}
+
+@media (max-width: 599px) {
+  .dash-heading {
+    font-size: 21px;
+  }
+  .pets-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .pet-card,
+  .add-pet-dashed {
+    min-height: 118px;
+    padding: 14px;
+  }
+  .pet-card-avatar {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 10px;
+  }
+  .attention-bar {
+    gap: 8px;
+  }
+  .attention-pill {
+    padding: 8px 12px;
+    font-size: 12.5px;
+  }
+  /* Header, then actions on their own line — three buttons will not share a
+     row with a name at this width. */
+  .selected-pet-header {
+    align-items: flex-start;
+  }
+  .selected-pet-actions {
+    margin-left: 0;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .load-error {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .load-error .btn {
+    width: 100%;
+  }
+  .reminder-when {
+    font-size: 12px;
+  }
 }

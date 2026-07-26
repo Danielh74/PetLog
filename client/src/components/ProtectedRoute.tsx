@@ -7,7 +7,7 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
 
   if (loading) {
     return (
-      <div className="app-shell center fill-center">
+      <div className="route-loading" role="status" aria-label="Loading">
         <span className="spinner" />
       </div>
     );

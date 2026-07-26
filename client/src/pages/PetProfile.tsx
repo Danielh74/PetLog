@@ -259,7 +259,7 @@ const PetProfile = () => {
   return (
     <AppLayout>
       <div className="page">
-        <div className="top-bar shell-topbar profile-topbar">
+        <div className="top-bar shell-topbar">
           <button className="topbar-back-link" onClick={() => navigate('/dashboard')}>
             <Icon name="arrow_back" size={18} />
             My Pets

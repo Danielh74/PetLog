@@ -7,15 +7,14 @@ import { checkSymptoms } from '../api/ai.ts';
 import type { Pet, SymptomCheckResult, Urgency } from '../types/index.ts';
 import './SymptomChecker.css';
 
-type Step = 'intro' | 'q1' | 'q2' | 'q3' | 'loading' | 'verdict' | 'error';
+type Step = 'intro' | 'loading' | 'verdict' | 'error';
 
-const Q = [
-  { key: 'q1' as const, title: 'How long has this been going on?', options: ['Just today', '1-2 days', '2-3 days', 'Over a week'] },
-  { key: 'q2' as const, title: 'Are they eating normally?', options: ['Normally', 'Mostly', 'Very little', 'Not at all'] },
-  { key: 'q3' as const, title: 'Any of these warning signs?', options: ['None', 'Vomiting', 'Lethargic / weak', 'Trouble breathing'] },
-];
+/* Mirrors the server's symptomCheckSchema so the user is told before the
+   round trip, not after a 400. */
+const MIN_CHARS = 10;
+const MAX_CHARS = 1000;
 
-const LOADING_MESSAGES = ['Reviewing the answers…', 'Comparing with care history…', 'Gauging urgency level…'];
+const LOADING_MESSAGES = ['Reading your description…', 'Comparing with care history…', 'Gauging urgency level…'];
 
 const VERDICT_META: Record<Urgency, { icon: string; tag: string; headline: string; tone: 'ok' | 'watch' | 'alert' }> = {
   can_wait: { icon: 'check_circle', tag: 'Low urgency', headline: 'Keep an eye on them', tone: 'ok' },
@@ -29,12 +28,18 @@ const ASIDE_ITEMS = [
   { icon: 'info', text: "This tool estimates urgency only — it never replaces a vet's exam." },
 ];
 
+const PROMPTS = [
+  'What you are seeing, and since when',
+  'Whether they are eating and drinking normally',
+  'Anything different about their behaviour or energy',
+];
+
 const SymptomChecker = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [pet, setPet] = useState<Pet | null>(null);
   const [step, setStep] = useState<Step>('intro');
-  const [answers, setAnswers] = useState<Record<string, string>>({ q1: '2-3 days', q2: 'Mostly', q3: 'None' });
+  const [symptoms, setSymptoms] = useState('');
   const [loadingMsg, setLoadingMsg] = useState(0);
   const [result, setResult] = useState<SymptomCheckResult | null>(null);
   const msgTimer = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -47,17 +52,18 @@ const SymptomChecker = () => {
     if (msgTimer.current) clearInterval(msgTimer.current);
   }, []);
 
-  const qIndex = Q.findIndex((q) => q.key === step);
+  const petName = pet?.name ?? 'your pet';
+  const trimmed = symptoms.trim();
+  const canSubmit = trimmed.length >= MIN_CHARS;
 
   const runCheck = async () => {
-    if (!id) return;
+    if (!id || !canSubmit) return;
     setStep('loading');
     setLoadingMsg(0);
-    msgTimer.current = setInterval(() => setLoadingMsg((m) => Math.min(m + 1, 2)), 700);
+    msgTimer.current = setInterval(() => setLoadingMsg((m) => Math.min(m + 1, LOADING_MESSAGES.length - 1)), 700);
 
-    const symptoms = `Duration of symptoms: ${answers.q1}. Eating: ${answers.q2}. Warning signs reported: ${answers.q3}.`;
     try {
-      const data = await checkSymptoms(id, symptoms);
+      const data = await checkSymptoms(id, trimmed);
       setResult(data);
       setStep('verdict');
     } catch {
@@ -68,33 +74,16 @@ const SymptomChecker = () => {
     }
   };
 
-  const handleNext = () => {
-    if (step === 'intro') setStep('q1');
-    else if (qIndex >= 0 && qIndex < Q.length - 1) setStep(Q[qIndex + 1]!.key);
-    else if (step === 'q3') void runCheck();
-  };
-
-  const handleBack = () => {
-    if (step === 'intro') navigate(`/pets/${id}`);
-    else if (qIndex === 0) setStep('intro');
-    else if (qIndex > 0) setStep(Q[qIndex - 1]!.key);
-    else navigate(`/pets/${id}`);
-  };
-
-  const currentQ = Q.find((q) => q.key === step);
-
   return (
     <FocusedLayout asideTitle="Know the signs" asideItems={ASIDE_ITEMS}>
       <div className="page">
         <div className="top-bar">
-          {step !== 'loading' && step !== 'verdict' && step !== 'error' && (
-            <button className="icon-btn" onClick={handleBack}>
+          {step === 'intro' && (
+            <button className="icon-btn" onClick={() => navigate(`/pets/${id}`)} aria-label="Back to profile">
               <Icon name="arrow_back" size={21} />
             </button>
           )}
-          <span className="grow topbar-title">
-            Symptom checker
-          </span>
+          <span className="grow topbar-title">Symptom checker</span>
           {step !== 'loading' && (
             <span className="row gap-sm muted checker-ai-badge">
               <Icon name="auto_awesome" size={15} filled />
@@ -106,40 +95,51 @@ const SymptomChecker = () => {
         <div className="scroll-area">
           <div className="checker-body">
             {step === 'intro' && (
-              <div className="center intro-wrap">
-                <div className="avatar intro-avatar">
-                  <Icon name="health_and_safety" size={40} filled />
-                </div>
-                <h2 className="intro-title">Is {pet?.name ?? 'your pet'} okay?</h2>
+              <div className="describe-wrap">
+                <h2 className="intro-title">What is going on with {petName}?</h2>
                 <p className="muted intro-subtitle">
-                  Answer a few quick questions and we'll gauge how urgent it is. This isn't a diagnosis.
+                  Describe it in your own words. The more detail you give, the better we can judge how urgent it is.
+                  This isn't a diagnosis.
                 </p>
+
+                <label className="describe-label" htmlFor="symptoms">
+                  Describe the symptoms
+                </label>
+                <textarea
+                  id="symptoms"
+                  className="describe-input"
+                  value={symptoms}
+                  maxLength={MAX_CHARS}
+                  onChange={(e) => setSymptoms(e.target.value)}
+                  placeholder={`e.g. ${petName} has been scratching one ear since yesterday and keeps tilting their head. Eating normally.`}
+                  rows={7}
+                  autoFocus
+                  aria-describedby="symptoms-help symptoms-count"
+                />
+
+                <div className="describe-meta">
+                  <span id="symptoms-help" className="muted describe-help">
+                    {canSubmit
+                      ? 'Add anything else you have noticed.'
+                      : `A little more detail, please — at least ${MIN_CHARS} characters.`}
+                  </span>
+                  <span id="symptoms-count" className="muted describe-count">
+                    {trimmed.length}/{MAX_CHARS}
+                  </span>
+                </div>
+
+                <div className="describe-prompts">
+                  <span className="describe-prompts-title">Helpful to mention</span>
+                  <ul>
+                    {PROMPTS.map((p) => (
+                      <li key={p}>{p}</li>
+                    ))}
+                  </ul>
+                </div>
+
                 <div className="row gap-sm intro-warning-row">
                   <Icon name="info" size={20} filled className="flex-none" />
-                  If {pet?.name ?? 'your pet'} is struggling to breathe or has collapsed, contact a vet immediately.
-                </div>
-              </div>
-            )}
-
-            {currentQ && (
-              <div>
-                <h2 className="question-title">{currentQ.title}</h2>
-                <div className="stack gap-sm">
-                  {currentQ.options.map((o) => {
-                    const active = answers[currentQ.key] === o;
-                    return (
-                      <button
-                        key={o}
-                        onClick={() => setAnswers((prev) => ({ ...prev, [currentQ.key]: o }))}
-                        className={`row option-row${active ? ' active' : ''}`}
-                      >
-                        <span>{o}</span>
-                        <span className={`option-check${active ? ' active' : ''}`}>
-                          <Icon name="check" size={16} />
-                        </span>
-                      </button>
-                    );
-                  })}
+                  If {petName} is struggling to breathe or has collapsed, contact a vet immediately.
                 </div>
               </div>
             )}
@@ -158,8 +158,8 @@ const SymptomChecker = () => {
                 </div>
                 <h2 className="error-title">We couldn't complete the check</h2>
                 <p className="muted error-body">
-                  This is not a signal that {pet?.name ?? 'your pet'} is fine. If anything seems urgent, please
-                  contact a vet directly. Otherwise, try running the check again in a moment.
+                  This is not a signal that {petName} is fine. If anything seems urgent, please contact a vet
+                  directly. Otherwise, try running the check again in a moment.
                 </p>
               </div>
             )}
@@ -172,6 +172,11 @@ const SymptomChecker = () => {
                   </span>
                   <div className="verdict-tag">{VERDICT_META[result.urgency].tag}</div>
                   <div className="verdict-headline">{VERDICT_META[result.urgency].headline}</div>
+                </div>
+
+                <div className="described-recap">
+                  <span className="described-recap-label">You described</span>
+                  <p className="muted">{trimmed}</p>
                 </div>
 
                 <div className="causes-title">Possible causes</div>
@@ -196,9 +201,15 @@ const SymptomChecker = () => {
         </div>
 
         <div className="checker-footer">
-          {(step === 'intro' || currentQ) && (
-            <button className="btn btn-primary" onClick={handleNext}>
-              {step === 'intro' ? 'Start check' : step === 'q3' ? 'See result' : 'Next'}
+          {step === 'intro' && (
+            <button className="btn btn-primary" onClick={() => void runCheck()} disabled={!canSubmit}>
+              Check symptoms
+            </button>
+          )}
+          {step === 'error' && (
+            <button className="btn btn-primary" onClick={() => setStep('intro')}>
+              <Icon name="refresh" size={18} />
+              Try again
             </button>
           )}
           {(step === 'verdict' || step === 'error') && (

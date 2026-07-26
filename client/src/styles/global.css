@@ -175,6 +175,13 @@ a {
   width: 34px;
   height: 34px;
 }
+.icon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.icon-btn:disabled:hover {
+  background: none;
+}
 .shell-topbar {
   border-bottom: 1px solid var(--border);
 }
@@ -286,7 +293,95 @@ a {
   padding: 16px;
 }
 
-/* ---------- Desktop defaults are used; no mobile overrides ---------- */
+/* ---------- Responsive ----------
+   Desktop-first: the rules above are the wide layout, and these narrow it.
+   Breakpoints match the ones already used by PetProfile/Reminders/Login so
+   the whole app turns at the same width.
+     ≤859px  — sidebar becomes a bottom bar, single column
+     ≤599px  — phone: tighter gutters, stacked rows                       */
+
+@media (max-width: 859px) {
+  .app-layout {
+    flex-direction: column;
+  }
+
+  /* Sidebar → bottom bar. Fixed so it survives the page's own scroll area,
+     and padded for the iOS home indicator. */
+  .app-layout .bottom-nav {
+    order: 1;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    z-index: 10;
+    flex-direction: row;
+    width: 100%;
+    height: auto;
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+    gap: 4px;
+    justify-content: space-around;
+    border-right: none;
+    border-top: 1px solid var(--border);
+    background: var(--md-sys-color-surface-container-low);
+  }
+  /* The wordmark and the account chip are sidebar furniture — the bottom bar
+     is only for destinations. Account is still reachable via its tab. */
+  .bottom-nav .nav-brand,
+  .bottom-nav .nav-user-chip,
+  .bottom-nav .nav-spacer {
+    display: none;
+  }
+  .bottom-nav a,
+  .bottom-nav button {
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    padding: 7px 4px;
+    margin-bottom: 0;
+    font-size: 11px;
+    min-height: 52px;
+    text-align: center;
+  }
+
+  /* Clear the fixed bar so the last row of content is never trapped under it. */
+  .app-layout .app-main {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+
+  .page-pad {
+    padding: 20px 16px 32px;
+  }
+  .top-bar {
+    padding: 0 16px;
+    gap: 10px;
+  }
+  .confirm-actions .btn {
+    flex: 1;
+  }
+}
+
+@media (max-width: 599px) {
+  .page-pad {
+    padding: 16px 14px 28px;
+  }
+  .top-bar {
+    padding: 0 14px;
+    gap: 8px;
+  }
+  .field-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  /* Full-bleed actions read as tappable targets on a phone. */
+  .confirm-actions {
+    flex-direction: column-reverse;
+  }
+  .confirm-actions .btn {
+    width: 100%;
+  }
+}
 
 /* ---------- Pills / chips ---------- */
 .pill {
@@ -595,6 +690,16 @@ a {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+/* Auth gate while Firebase restores the session. Previously this used an
+   .app-shell class no stylesheet defined, so the spinner sat at the top of a
+   blank page instead of centred. */
+.route-loading {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: var(--md-sys-color-surface);
 }
 
 /* ---------- Spinner ---------- */

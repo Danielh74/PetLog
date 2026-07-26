@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../components/Icon.tsx';
 import AppLayout from '../components/AppLayout.tsx';
@@ -17,19 +17,32 @@ const Dashboard = () => {
   const [search, setSearch] = useState('');
   const [selectedPetId, setSelectedPetId] = useState<string | null>(null);
 
+  // No setState before the first await: on mount this runs inside an effect,
+  // and a synchronous update there cascades an extra render.
+  const load = useCallback(async () => {
+    try {
+      const [petsData, remindersData] = await Promise.all([getMyPets(), getReminders()]);
+      setPets(petsData);
+      setReminders(remindersData.filter((r) => !r.isDone));
+    } catch {
+      setError('We could not reach PetLog just now. Your records are safe.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     (async () => {
-      try {
-        const [petsData, remindersData] = await Promise.all([getMyPets(), getReminders()]);
-        setPets(petsData);
-        setReminders(remindersData.filter((r) => !r.isDone));
-      } catch {
-        setError('Could not load your pets right now. Pull down to try again.');
-      } finally {
-        setLoading(false);
-      }
+      await load();
     })();
-  }, []);
+  }, [load]);
+
+  // Retry runs from a click, so resetting the state up front is fine here.
+  const retry = () => {
+    setLoading(true);
+    setError('');
+    void load();
+  };
 
   const filteredPets = pets.filter((p) => p.name.toLowerCase().includes(search.trim().toLowerCase()));
 
@@ -102,7 +115,23 @@ const Dashboard = () => {
               </div>
             )}
 
-            {!loading && error && <p className="error-text">{error}</p>}
+            {!loading && error && (
+              <div className="load-error" role="alert">
+                <span className="avatar load-error-icon">
+                  <Icon name="cloud_off" size={26} />
+                </span>
+                <div className="load-error-copy">
+                  <div className="load-error-title">{error}</div>
+                  <p className="muted load-error-body">
+                    This is a connection problem, not a problem with your pets' records.
+                  </p>
+                </div>
+                <button className="btn btn-primary btn-sm" onClick={retry}>
+                  <Icon name="refresh" size={18} />
+                  Try again
+                </button>
+              </div>
+            )}
 
             {!loading && !error && (
               <>
@@ -178,9 +207,13 @@ const Dashboard = () => {
                           <Icon name="health_and_safety" size={16} filled />
                           Check
                         </button>
+                        {/* A pet created before share tokens existed has none;
+                            linking anyway would land on /share/undefined. */}
                         <button
                           className="icon-btn icon-btn-sm"
                           onClick={() => navigate(`/share/${selectedPet.shareToken}`)}
+                          disabled={!selectedPet.shareToken}
+                          title={selectedPet.shareToken ? undefined : 'No share link for this pet yet'}
                           aria-label={`Share ${selectedPet.name}'s record`}
                         >
                           <Icon name="ios_share" size={18} />
