@@ -8,6 +8,18 @@
   display: none;
 }
 
+/* global.css sets a near-black colour on every h1/h2/h3. A rule that matches
+   the element directly beats the white colour inherited from .auth-brand, so
+   this headline was rendering at 2.65:1 on the green — 1.74:1 at the dark end
+   of the gradient. Following the panel's own token puts it back to 6.5–9.8:1.
+   Declared outside the 900px query so it holds wherever the panel is shown. */
+.auth-headline {
+  color: inherit;
+}
+
+/* The form used to sit on --surface-dim (#d6dcd7), a mid grey-green that
+   dragged every label, hint and input edge down toward the background. On the
+   lightest surface the same text gains roughly 40% more contrast. */
 .auth-form-wrap {
   flex: 1;
   min-height: 100vh;
@@ -15,7 +27,7 @@
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
-  background: var(--md-sys-color-surface-dim);
+  background: var(--md-sys-color-surface-container-lowest);
 }
 .auth-form-col {
   width: 100%;
@@ -29,16 +41,31 @@
   margin-bottom: 28px;
   font-size: 14.5px;
 }
+/* .btn is width:auto, so these two sized to their own labels — "Log in" came
+   out narrow and "Continue with Google" wide, stacked and ragged. In a single
+   form column both actions span the field width above them. */
 .auth-submit {
-  height: 46px;
+  width: 100%;
+  height: var(--control-h-md);
   margin-top: 4px;
+}
+/* The Google mark is the anchor: centring the pair keeps the label optically
+   centred while the icon stays a fixed distance from it. */
+.auth-google {
+  margin-top: 0;
+  gap: 10px;
 }
 .login-field-tight {
   margin-bottom: 18px;
 }
+/* Equal breathing room above and below, so the two actions read as a pair
+   separated by a rule rather than as two loose buttons. */
 .divider-row {
-  margin: 20px 0;
-  font-size: 12px;
+  margin: 18px 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 .divider-line {
   height: 1px;
@@ -85,36 +112,59 @@
     display: grid;
     place-items: center;
   }
+  /* ---------- Hierarchy on an inverted panel ----------
+     Everything here is white, so rank comes from size, weight and structure
+     first, and only then from three measured alpha tiers. The floor is 0.78
+     (4.58:1 at the dark end of the gradient); nothing sits below it.
+
+       wordmark  0.85  small, quiet — an identifier, not a message
+       headline  1.00  the one thing at full strength
+       subtext   0.86  supports the headline, one step back
+       bullets   0.92  brighter than subtext but small and boxed, so they
+                       read as a scannable list rather than as prose        */
   .auth-wordmark {
     font-family: var(--pawly-font-display);
-    font-size: 21px;
+    font-size: 19px;
     font-weight: 600;
+    opacity: 0.85;
+    letter-spacing: 0.01em;
   }
   .auth-headline {
-    font-size: 38px;
+    font-size: 40px;
     font-weight: 600;
-    line-height: 1.15;
-    margin: 0 0 16px;
-    max-width: 420px;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    margin: 0 0 18px;
+    max-width: 15ch;
+    text-wrap: balance;
   }
   .auth-subtext {
-    font-size: 15.5px;
+    font-size: 16px;
     line-height: 1.6;
-    opacity: 0.92;
-    max-width: 400px;
-    margin: 0 0 32px;
+    opacity: 0.86;
+    max-width: 42ch;
+    margin: 0 0 36px;
   }
+  /* Boxed rows give the list its own shape, so the eye separates it from the
+     paragraph above without needing a brightness difference to do the work. */
   .auth-bullets {
-    max-width: 380px;
+    max-width: 400px;
+    gap: 10px;
   }
   .auth-bullet {
     font-size: 14.5px;
+    font-weight: 500;
+    opacity: 0.92;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
   }
   .auth-bullet-icon {
     width: 32px;
     height: 32px;
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.18);
     display: grid;
     place-items: center;
     flex: none;

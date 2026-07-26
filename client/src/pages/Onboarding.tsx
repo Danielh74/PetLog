@@ -97,7 +97,10 @@ const Onboarding = () => {
           }),
         );
       }
-      await Promise.all(jobs);
+      // The pet exists from here on. If a reminder or the weight record fails
+      // we still move on — retrying the whole step would create a second pet,
+      // and these are all editable from the profile.
+      await Promise.allSettled(jobs);
       navigate(`/pets/${pet._id}`);
     } catch {
       setError('Could not save this pet. Please check the details and try again.');

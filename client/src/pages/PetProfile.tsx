@@ -5,11 +5,13 @@ import Toast from '../components/Toast.tsx';
 import DateInput from '../components/DateInput.tsx';
 import ConfirmDialog from '../components/ConfirmDialog.tsx';
 import AppLayout from '../components/AppLayout.tsx';
+import Portal from '../components/Portal.tsx';
 import { useToast } from '../utils/useToast.ts';
 import { getPet, updatePet, deletePet, type UpdatePetInput } from '../api/pets.ts';
 import { createRecord, type CreateRecordInput } from '../api/records.ts';
-import type { HealthRecord, HealthRecordType, Pet, Species } from '../types/index.ts';
-import { ageFromDob, formatDate, speciesIcon, speciesLabel } from '../utils/petMeta.ts';
+import { getReminders, updateReminder } from '../api/reminders.ts';
+import type { HealthRecord, HealthRecordType, Pet, Reminder, Species } from '../types/index.ts';
+import { ageFromDob, formatDate, relativeDue, speciesIcon, speciesLabel } from '../utils/petMeta.ts';
 import './PetProfile.css';
 
 const SPECIES_LABELS: Record<Species, string> = {
@@ -29,10 +31,18 @@ const TYPE_META: Record<HealthRecordType, { icon: string; label: string; tone: s
   other: { icon: 'event_note', label: 'Other', tone: 'other' },
 };
 
-const FILTERS: { id: HealthRecordType | 'all'; label: string }[] = [
+type FilterId = HealthRecordType | 'all';
+
+/* Six pills overflowed into a horizontal scroller, which hides options behind
+   a gesture people do not know is there. The three that carry most of the log
+   stay visible; the rest live in an overflow menu. */
+const PRIMARY_FILTERS: { id: FilterId; label: string }[] = [
   { id: 'all', label: 'All' },
   { id: 'vaccination', label: 'Vaccines' },
   { id: 'vet_visit', label: 'Vet' },
+];
+
+const OVERFLOW_FILTERS: { id: FilterId; label: string }[] = [
   { id: 'medication', label: 'Meds' },
   { id: 'weight', label: 'Weight' },
   { id: 'grooming', label: 'Grooming' },
@@ -67,13 +77,8 @@ const AddRecordForm = ({
 
   return (
     <div>
-      <div className="row gap-sm sheet-title">
-        <button className="icon-btn add-record-back" onClick={onCancel}>
-          <Icon name="arrow_back" size={20} />
-        </button>
-        {meta.label}
-      </div>
-      <div className="add-record-body">
+      <div className="sheet-title">{meta.label}</div>
+      <div className="sheet-body">
         <div className="field">
           <label>Title</label>
           <input value={title} onChange={(e) => setTitle(e.target.value)} />
@@ -92,9 +97,16 @@ const AddRecordForm = ({
           <label>Notes (optional)</label>
           <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Dr. Patel · Maple Vet Clinic" />
         </div>
-        <button className="btn btn-primary" onClick={submit}>
-          Save
-        </button>
+        {/* Same action pair as Edit pet: secondary back to the type list,
+            primary to commit. Both dialogs now close the same way. */}
+        <div className="sheet-actions">
+          <button className="btn btn-outline" onClick={onCancel}>
+            Back
+          </button>
+          <button className="btn btn-primary" onClick={submit}>
+            Save
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -126,7 +138,7 @@ const EditPetForm = ({
   return (
     <div>
       <div className="sheet-title">Edit pet</div>
-      <div className="add-record-body">
+      <div className="sheet-body">
         <div className="field">
           <label>Name</label>
           <input value={name} onChange={(e) => setName(e.target.value)} />
@@ -146,12 +158,12 @@ const EditPetForm = ({
           <input value={breed} onChange={(e) => setBreed(e.target.value)} />
         </div>
         <DateInput label="Birthday" value={dob} onChange={setDob} />
-        <div className="row gap-sm edit-pet-actions">
+        <div className="sheet-actions">
           <button className="btn btn-outline" onClick={onCancel}>
             Cancel
           </button>
           <button className="btn btn-primary" onClick={submit}>
-            Save changes
+            Save
           </button>
         </div>
       </div>
@@ -165,12 +177,14 @@ const PetProfile = () => {
   const { toast, showToast } = useToast();
 
   const [pet, setPet] = useState<Pet | null>(null);
+  const [reminders, setReminders] = useState<Reminder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [filter, setFilter] = useState<HealthRecordType | 'all'>('all');
+  const [filter, setFilter] = useState<FilterId>('all');
+  const [filterMenuOpen, setFilterMenuOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [sheetError, setSheetError] = useState('');
   const [chosenType, setChosenType] = useState<HealthRecordType | null>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -185,14 +199,41 @@ const PetProfile = () => {
 
   useEffect(load, [id]);
 
+  // There is no per-pet reminders endpoint, so scope the full list here.
+  // A failure is silent: reminders are secondary to the record itself.
+  useEffect(() => {
+    if (!id) return;
+    getReminders()
+      .then((all) => setReminders(all.filter((r) => (typeof r.pet === 'object' ? r.pet._id : r.pet) === id)))
+      .catch(() => {});
+  }, [id]);
+
+  const markReminderDone = async (reminderId: string) => {
+    setReminders((prev) => prev.map((r) => (r._id === reminderId ? { ...r, isDone: true } : r)));
+    try {
+      await updateReminder(reminderId, { isDone: true });
+    } catch {
+      setReminders((prev) => prev.map((r) => (r._id === reminderId ? { ...r, isDone: false } : r)));
+    }
+  };
+
   const closeSheet = () => {
     setSheetOpen(false);
     setChosenType(null);
+    setSheetError('');
   };
 
+  // A rejected save used to reject silently: the sheet stayed open with no
+  // message, which reads as "the button does nothing".
   const handleSaveRecord = async (input: CreateRecordInput) => {
     if (!id) return;
-    await createRecord(id, input);
+    setSheetError('');
+    try {
+      await createRecord(id, input);
+    } catch {
+      setSheetError('Could not save this record. Check the details and try again.');
+      return;
+    }
     closeSheet();
     showToast(`${TYPE_META[input.type].label} added to ${pet?.name}'s log`);
     load();
@@ -207,7 +248,13 @@ const PetProfile = () => {
 
   const handleUpdatePet = async (input: UpdatePetInput) => {
     if (!id) return;
-    await updatePet(id, input);
+    setSheetError('');
+    try {
+      await updatePet(id, input);
+    } catch {
+      setSheetError('Could not save these changes. Please try again.');
+      return;
+    }
     setEditOpen(false);
     showToast('Pet updated');
     load();
@@ -255,55 +302,20 @@ const PetProfile = () => {
   const latestWeight = weightRecords.at(-1)?.weight;
   const wMax = weightRecords.length ? Math.max(...weightRecords.map((w) => w.weight)) : 1;
   const wMin = weightRecords.length ? Math.min(...weightRecords.map((w) => w.weight)) : 0;
+  const petPending = reminders
+    .filter((r) => !r.isDone)
+    .sort((a, b) => +new Date(a.dueDate) - +new Date(b.dueDate));
+  const overflowActive = OVERFLOW_FILTERS.find((f) => f.id === filter);
 
   return (
     <AppLayout>
       <div className="page">
-        <div className="top-bar shell-topbar profile-topbar">
+        <div className="top-bar shell-topbar">
           <button className="topbar-back-link" onClick={() => navigate('/dashboard')}>
             <Icon name="arrow_back" size={18} />
             My Pets
           </button>
           <span className="grow" />
-          <button className="btn btn-outline btn-sm" onClick={() => navigate(`/pets/${id}/symptom-check`)}>
-            <Icon name="health_and_safety" size={18} filled />
-            Check symptom
-          </button>
-          <button className="icon-btn" onClick={handleShare} aria-label="Share">
-            <Icon name="ios_share" size={22} />
-          </button>
-          <div className="menu-anchor">
-            <button className="icon-btn" onClick={() => setMenuOpen((v) => !v)} aria-label="More options">
-              <Icon name="more_vert" size={22} />
-            </button>
-            {menuOpen && (
-              <>
-                <div className="menu-backdrop" onClick={() => setMenuOpen(false)} />
-                <div className="menu-popover">
-                  <button
-                    className="menu-item"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      setEditOpen(true);
-                    }}
-                  >
-                    <Icon name="edit" size={18} />
-                    Edit pet
-                  </button>
-                  <button
-                    className="menu-item danger"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      setDeleteOpen(true);
-                    }}
-                  >
-                    <Icon name="delete" size={18} />
-                    Delete pet
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
         </div>
 
         <div className="scroll-area">
@@ -316,6 +328,37 @@ const PetProfile = () => {
                 <h1 className="profile-name">{pet.name}</h1>
                 <div className="muted profile-meta">{pet.breed || speciesLabel[pet.species]}</div>
               </div>
+            </div>
+
+            {/* Actions sit with the pet they act on rather than in the top bar.
+                Five controls could not share a 375px bar, and here they wrap
+                onto a second line instead of overflowing. Edit and Delete are
+                stated outright — hiding destructive actions behind a kebab
+                makes them harder to find without making them safer. */}
+            <div className="pet-actions">
+              <button className="btn btn-primary btn-sm" onClick={() => navigate(`/pets/${id}/symptom-check`)}>
+                <Icon name="health_and_safety" size={18} filled />
+                Symptom check
+              </button>
+              <button className="btn btn-outline btn-sm" onClick={handleShare}>
+                <Icon name="ios_share" size={17} />
+                Share
+              </button>
+              <span className="pet-actions-gap" />
+              <button
+                className="btn btn-outline btn-sm"
+                onClick={() => {
+                  setSheetError('');
+                  setEditOpen(true);
+                }}
+              >
+                <Icon name="edit" size={17} />
+                Edit
+              </button>
+              <button className="btn btn-outline btn-sm btn-danger-outline" onClick={() => setDeleteOpen(true)}>
+                <Icon name="delete" size={17} />
+                Delete
+              </button>
             </div>
 
             <div className="profile-columns">
@@ -335,8 +378,43 @@ const PetProfile = () => {
                   </div>
                 </div>
 
+                <div className="card">
+                  <div className="row gap-sm pet-reminders-header">
+                    <span className="pet-reminders-title grow">Reminders</span>
+                    <span className="muted pet-reminders-count">{petPending.length} open</span>
+                  </div>
+                  {petPending.length === 0 ? (
+                    <p className="muted pet-reminders-empty">Nothing due for {pet.name}.</p>
+                  ) : (
+                    petPending.map((r) => {
+                      const due = relativeDue(r.dueDate);
+                      return (
+                        <div key={r._id} className={`pet-reminder-row${due.overdue ? ' overdue' : ''}`}>
+                          <Icon
+                            name={due.overdue ? 'error' : 'event_upcoming'}
+                            size={19}
+                            filled={due.overdue}
+                            className="flex-none"
+                          />
+                          <div className="min-w-0 grow">
+                            <div className="pet-reminder-title">{r.title}</div>
+                            <div className="pet-reminder-due">{due.label}</div>
+                          </div>
+                          <button
+                            className="icon-btn icon-btn-sm"
+                            onClick={() => void markReminderDone(r._id)}
+                            aria-label={`Mark "${r.title}" done`}
+                          >
+                            <Icon name="check_circle" size={19} />
+                          </button>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
                 {weightRecords.length > 1 && (
-                  <div className="card weight-card">
+                  <div className="card">
                     <div className="row weight-header">
                       <span className="weight-title">Weight trend</span>
                       <span className="muted weight-unit">kg</span>
@@ -364,8 +442,8 @@ const PetProfile = () => {
                   </button>
                 </div>
 
-                <div className="pill-row filter-row">
-                  {FILTERS.map((f) => (
+                <div className="filter-row">
+                  {PRIMARY_FILTERS.map((f) => (
                     <button
                       key={f.id}
                       className={`pill${filter === f.id ? ' active' : ''}`}
@@ -374,6 +452,49 @@ const PetProfile = () => {
                       {f.label}
                     </button>
                   ))}
+
+                  {/* A selection made from the menu is promoted into the row,
+                      so the current filter is never invisible. */}
+                  {overflowActive && (
+                    <button className="pill active" onClick={() => setFilter('all')}>
+                      {overflowActive.label}
+                      <Icon name="close" size={14} />
+                    </button>
+                  )}
+
+                  <div className="filter-menu-anchor">
+                    <button
+                      className={`pill filter-more${filterMenuOpen ? ' open' : ''}`}
+                      onClick={() => setFilterMenuOpen((v) => !v)}
+                      aria-haspopup="menu"
+                      aria-expanded={filterMenuOpen}
+                      aria-label="More filters"
+                    >
+                      <Icon name="more_horiz" size={18} />
+                    </button>
+                    {filterMenuOpen && (
+                      <>
+                        <div className="menu-backdrop" onClick={() => setFilterMenuOpen(false)} />
+                        <div className="filter-menu" role="menu">
+                          {OVERFLOW_FILTERS.map((f) => (
+                            <button
+                              key={f.id}
+                              role="menuitemradio"
+                              aria-checked={filter === f.id}
+                              className={`filter-menu-item${filter === f.id ? ' active' : ''}`}
+                              onClick={() => {
+                                setFilter(f.id);
+                                setFilterMenuOpen(false);
+                              }}
+                            >
+                              {f.label}
+                              {filter === f.id && <Icon name="check" size={16} />}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
 
                 {shown.length === 0 && <p className="muted empty-state">No records in this filter yet.</p>}
@@ -406,10 +527,9 @@ const PetProfile = () => {
         </div>
 
         {sheetOpen && (
-          <>
+          <Portal lockScroll>
             <div className="sheet-scrim" onClick={closeSheet} />
-            <div className="sheet">
-              <div className="sheet-handle" />
+            <div className="sheet" role="dialog" aria-modal="true" aria-label="Add a record">
               {!chosenType ? (
                 <>
                   <div className="sheet-title">Add a record</div>
@@ -424,20 +544,23 @@ const PetProfile = () => {
                   ))}
                 </>
               ) : (
-                <AddRecordForm type={chosenType} onCancel={() => setChosenType(null)} onSaved={handleSaveRecord} />
+                <>
+                  {sheetError && <p className="sheet-error">{sheetError}</p>}
+                  <AddRecordForm type={chosenType} onCancel={() => setChosenType(null)} onSaved={handleSaveRecord} />
+                </>
               )}
             </div>
-          </>
+          </Portal>
         )}
 
         {editOpen && (
-          <>
+          <Portal lockScroll>
             <div className="sheet-scrim" onClick={() => setEditOpen(false)} />
-            <div className="sheet">
-              <div className="sheet-handle" />
+            <div className="sheet" role="dialog" aria-modal="true" aria-label={`Edit ${pet.name}`}>
+              {sheetError && <p className="sheet-error">{sheetError}</p>}
               <EditPetForm pet={pet} onCancel={() => setEditOpen(false)} onSaved={handleUpdatePet} />
             </div>
-          </>
+          </Portal>
         )}
 
         {deleteOpen && (

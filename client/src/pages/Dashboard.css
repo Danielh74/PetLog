@@ -2,12 +2,37 @@
   height: 64px;
   padding: 0 32px;
 }
-.dash-title {
+
+/* Pets and Reminders are two bands of one scrolling page. scroll-margin-top
+   keeps a hash jump from parking the heading flush against the top edge. */
+.dash-section {
+  scroll-margin-top: 12px;
+}
+.dash-section + .dash-section {
+  margin-top: 34px;
+  padding-top: 26px;
+  border-top: 1px solid var(--border);
+}
+.dash-section-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.dash-heading {
   font-family: var(--pawly-font-display);
   font-size: 24px;
   font-weight: 600;
-  white-space: nowrap;
+  line-height: 1.2;
+  margin: 0 auto 0 0;
+  color: var(--text-body);
 }
+.dash-section-count {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ---------- Search ---------- */
 .search-wrap {
   display: flex;
   align-items: center;
@@ -17,7 +42,7 @@
   padding: 8px 12px;
   background: var(--md-sys-color-surface);
   width: 220px;
-  flex: 1 1 180px;
+  flex: 0 1 260px;
   min-width: 0;
   max-width: 340px;
 }
@@ -30,6 +55,8 @@
   color: var(--text-body);
   width: 100%;
 }
+
+/* ---------- Attention bar ---------- */
 .attention-bar {
   display: flex;
   gap: 10px;
@@ -58,23 +85,11 @@
   color: var(--status-healthy);
 }
 
-.reminders-section {
-  max-width: 680px;
-}
-.section-label {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-body);
-  margin: 0 0 14px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+/* ---------- Pets grid ---------- */
 .pets-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
   gap: 14px;
-  margin-bottom: 24px;
 }
 .pet-card {
   position: relative;
@@ -96,34 +111,33 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   border-color: var(--border-strong);
 }
-.pet-card.selected {
-  border: 2px solid var(--brand);
-  box-shadow: 0 0 0 4px var(--brand-soft);
-}
 .pet-card-avatar {
   width: 52px;
   height: 52px;
   margin-bottom: 14px;
 }
+/* Species tints: pale wash, dark ink, always alongside the species glyph — so
+   colour speeds up scanning without ever being the only signal (WCAG 1.4.1),
+   and nothing here reaches the chroma of a filled button. */
 .species-dog {
-  background: var(--md-sys-color-primary-container);
-  color: var(--md-sys-color-on-primary-container);
+  background: var(--tint-dog);
+  color: var(--tint-dog-ink);
 }
 .species-cat {
-  background: var(--md-sys-color-tertiary-container);
-  color: var(--md-sys-color-on-tertiary-container);
+  background: var(--tint-cat);
+  color: var(--tint-cat-ink);
 }
 .species-bird {
-  background: var(--md-sys-color-secondary-container);
-  color: var(--md-sys-color-on-secondary-container);
+  background: var(--tint-bird);
+  color: var(--tint-bird-ink);
 }
 .species-rabbit {
-  background: var(--md-sys-color-surface-variant);
-  color: var(--md-sys-color-on-surface-variant);
+  background: var(--tint-rabbit);
+  color: var(--tint-rabbit-ink);
 }
 .species-other {
-  background: var(--brand-soft);
-  color: var(--md-sys-color-on-primary-container);
+  background: var(--tint-other);
+  color: var(--tint-other-ink);
 }
 .pet-name {
   font-family: var(--pawly-font-display);
@@ -179,150 +193,197 @@
   background: var(--brand-soft);
   border-color: var(--brand);
 }
-
-.selected-pet-detail {
-  background: var(--surface-card);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 18px;
-  margin-bottom: 22px;
-}
-.selected-pet-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 14px;
-}
-.selected-pet-name {
-  font-family: var(--pawly-font-display);
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--text-body);
-}
-.selected-pet-actions {
-  display: flex;
-  gap: 6px;
-  margin-left: auto;
-}
-.selected-pet-actions .btn-sm {
-  height: 34px;
-  padding: 0 13px;
-  font-size: 12.5px;
-}
-.selected-pet-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-.stat-card {
-  background: var(--md-sys-color-surface-container-low);
-  border-radius: 14px;
-  padding: 12px;
-  text-align: center;
-}
-.stat-value {
-  font-family: var(--pawly-font-display);
-  font-size: 19px;
-  font-weight: 600;
-  color: var(--text-body);
-}
-.stat-label {
-  font-size: 11px;
-  color: var(--text-muted);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  margin-top: 1px;
-}
-
-.clear-selection {
-  height: 30px;
-  padding: 0 12px;
-  border: 1px solid var(--border-strong);
-  background: transparent;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  color: var(--text-muted);
-  font-weight: 600;
-  font-size: 12.5px;
-  cursor: pointer;
-  font-family: var(--pawly-font-body);
-  transition: background 0.15s ease, color 0.15s ease;
-}
-.clear-selection:hover {
-  background: var(--md-sys-color-surface-container-high);
-  color: var(--text-body);
-}
 .empty-state {
   grid-column: 1 / -1;
   padding: 20px 4px;
   font-size: 14px;
 }
-.reminder-badge-row {
-  margin: 0 4px 9px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--status-alert);
-}
-.reminder-badge-row.upcoming {
-  margin: 14px 4px 9px;
-  color: var(--text-body);
-}
-.badge-count {
+
+/* ---------- Reminders band ---------- */
+.reminder-group-label {
   font-size: 12px;
   font-weight: 700;
-  padding: 1px 8px;
-  border-radius: 999px;
-  background: var(--md-sys-color-error-container);
-  color: var(--md-sys-color-on-error-container);
-}
-.badge-count.neutral {
-  background: var(--md-sys-color-surface-container-high);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
   color: var(--text-muted);
+  margin: 16px 2px 8px;
 }
-.reminder-row-overdue {
-  padding: 13px 14px;
+.reminder-group-label:first-of-type {
+  margin-top: 0;
+}
+.reminder-group-label.overdue {
+  color: var(--status-alert);
+}
+.reminder-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
   border-radius: 16px;
-  background: var(--md-sys-color-error-container);
-  color: var(--md-sys-color-on-error-container);
+  border: 1px solid var(--border);
+  background: var(--surface-card);
   margin-bottom: 9px;
 }
-.reminder-icon-alert {
+.reminder-row.overdue {
+  background: var(--md-sys-color-error-container);
+  border-color: transparent;
+  color: var(--md-sys-color-on-error-container);
+}
+.reminder-avatar {
   width: 40px;
   height: 40px;
+}
+.reminder-avatar.overdue {
   background: var(--md-sys-color-error);
   color: var(--md-sys-color-on-error);
 }
-.reminder-row-upcoming {
-  margin-bottom: 9px;
-}
-.icon-avatar-sm {
-  width: 40px;
-  height: 40px;
+.reminder-main {
+  flex: 1;
+  min-width: 0;
 }
 .reminder-line {
   font-size: 15px;
+  font-weight: 500;
 }
-.reminder-detail {
-  font-size: 13px;
-  opacity: 0.85;
+/* Reads as text until you reach for it — the row is already busy. */
+.reminder-pet-link {
+  border: none;
+  background: none;
+  padding: 0;
+  font-family: var(--pawly-font-body);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: inherit;
+  opacity: 0.75;
+  cursor: pointer;
+  text-align: left;
+}
+.reminder-pet-link:hover {
+  text-decoration: underline;
+  opacity: 1;
 }
 .reminder-when {
-  margin-left: auto;
   font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
+  flex: none;
 }
-.reminder-when.muted-when {
-  font-weight: 400;
-}
+
+/* ---------- States ---------- */
 .spinner-wrap {
   padding: 60px 0;
 }
-.empty-reminders {
-  font-size: 14px;
-  margin: 0 4px;
+/* Failure needs a way out. The old copy said "pull down to try again", which
+   is a gesture this desktop app does not have. */
+.load-error {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface-card);
+}
+.load-error-icon {
+  width: 46px;
+  height: 46px;
+}
+.load-error-copy {
+  flex: 1;
+  min-width: 0;
+}
+.load-error-title {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+.load-error-body {
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 859px) {
+  /* .dash-topbar is loaded after global.css, so its 32px gutter would win
+     over the responsive .top-bar rule without this. */
+  .dash-topbar {
+    padding: 0 16px;
+  }
+  /* min() keeps the track from demanding more width than the screen has,
+     which is what forces a horizontal scrollbar on small phones. */
+  .pets-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(180px, 100%), 1fr));
+    gap: 12px;
+  }
+  .search-wrap {
+    flex: 1 1 auto;
+    width: auto;
+  }
+}
+
+@media (max-width: 599px) {
+  .dash-heading {
+    font-size: 21px;
+  }
+  .pets-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .pet-card,
+  .add-pet-dashed {
+    min-height: 118px;
+    padding: 14px;
+  }
+  .pet-card-avatar {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 10px;
+  }
+  .attention-bar {
+    gap: 8px;
+  }
+  .attention-pill {
+    padding: 8px 12px;
+    font-size: 12.5px;
+  }
+  .load-error {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .load-error .btn {
+    width: 100%;
+  }
+  /* The due label drops under the title so the row keeps its tick button. */
+  .reminder-row {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+  .reminder-when {
+    font-size: 12px;
+    order: 3;
+    width: 100%;
+    padding-left: 52px;
+  }
+}
+
+/* Reminder-type tints, matching the health-log swatches so the same kind of
+   care looks the same wherever it appears. */
+.reminder-avatar.tone-vax {
+  background: var(--tint-vax);
+  color: var(--tint-vax-ink);
+}
+.reminder-avatar.tone-vet {
+  background: var(--tint-vet);
+  color: var(--tint-vet-ink);
+}
+.reminder-avatar.tone-med {
+  background: var(--tint-med);
+  color: var(--tint-med-ink);
+}
+.reminder-avatar.tone-wt {
+  background: var(--tint-weight);
+  color: var(--tint-weight-ink);
+}
+.reminder-avatar.tone-other {
+  background: var(--icon-container);
+  color: var(--on-icon-container);
 }

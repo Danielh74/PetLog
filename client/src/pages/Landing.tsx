@@ -84,24 +84,34 @@ const Landing = () => {
             </div>
           </div>
 
+          {/* Was a filled brand panel with its own urgency headline, which read
+              as a second call to action and pulled attention off the real one.
+              Now a quiet, outlined preview of the record itself. */}
           <div className="landing-hero-right">
-            <div className="landing-verdict-card">
-              <div className="landing-card-row">
-                <Icon name="vaccines" size={21} />
-                DHPP · next due Apr 2026
+            <div className="landing-preview">
+              <div className="landing-preview-head">
+                <span className="avatar landing-preview-avatar">
+                  <Icon name="pets" size={20} filled />
+                </span>
+                <div>
+                  <div className="landing-preview-name">Mango</div>
+                  <div className="landing-preview-meta">Beagle · 4 yrs</div>
+                </div>
               </div>
-              <div className="landing-card-row alert">
-                <Icon name="error" size={21} filled />
-                Rabies booster · 2 weeks overdue
+              <div className="landing-preview-row">
+                <Icon name="vaccines" size={19} className="landing-preview-icon" />
+                <span>DHPP</span>
+                <span className="landing-preview-when">Apr 2026</span>
               </div>
-              <div className="landing-card-row">
-                <Icon name="monitor_weight" size={21} />
-                24.0 kg · +0.3 since last
+              <div className="landing-preview-row overdue">
+                <Icon name="error" size={19} filled />
+                <span>Rabies booster</span>
+                <span className="landing-preview-when">2 weeks overdue</span>
               </div>
-              <div className="landing-urgency">
-                <div className="landing-urgency-tag">Urgency · level 2 of 3</div>
-                <div className="landing-urgency-headline">See a vet within 48 hours</div>
-                <div className="landing-urgency-body">Not an emergency tonight, but this needs care soon.</div>
+              <div className="landing-preview-row">
+                <Icon name="monitor_weight" size={19} className="landing-preview-icon" />
+                <span>Weight</span>
+                <span className="landing-preview-when">24.0 kg</span>
               </div>
             </div>
           </div>
@@ -140,14 +150,6 @@ const Landing = () => {
             ))}
           </div>
         </section>
-
-        <div className="landing-trust">
-          <Icon name="verified_user" size={22} />
-          <span>
-            <b>On the AI:</b> PetLog symptom checker gives general guidance and an urgency level -- it never
-            diagnoses, and it always tells you when to see a vet. It is not a substitute for professional care.
-          </span>
-        </div>
 
         <section className="landing-cta-band">
           <h2>Start with one pet. It takes two minutes.</h2>
