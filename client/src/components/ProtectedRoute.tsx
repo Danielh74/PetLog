@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.tsx';
+import { useAuth } from '../context/useAuth.ts';
 
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   const { firebaseUser, loading } = useAuth();

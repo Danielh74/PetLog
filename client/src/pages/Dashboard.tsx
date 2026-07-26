@@ -31,10 +31,14 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
+  // Captured when the data lands rather than read during render: reading the
+  // clock mid-render makes the same props produce different output.
+  const [now, setNow] = useState(0);
 
   const load = useCallback(async () => {
     try {
       const [petsData, remindersData] = await Promise.all([getMyPets(), getReminders()]);
+      setNow(Date.now());
       setPets(petsData);
       setReminders(remindersData);
     } catch {
@@ -77,7 +81,6 @@ const Dashboard = () => {
   const filteredPets = pets.filter((p) => p.name.toLowerCase().includes(search.trim().toLowerCase()));
 
   const pending = reminders.filter((r) => !r.isDone);
-  const now = Date.now();
   const overdue = pending
     .filter((r) => new Date(r.dueDate).getTime() < now)
     .sort((a, b) => +new Date(a.dueDate) - +new Date(b.dueDate));

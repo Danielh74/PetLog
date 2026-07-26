@@ -1,7 +1,7 @@
 import { useEffect, useState, type MouseEvent } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import Icon from './Icon.tsx';
-import { useAuth } from '../context/AuthContext.tsx';
+import { useAuth } from '../context/useAuth.ts';
 
 const initials = (name: string) =>
   name

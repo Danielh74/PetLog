@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.tsx';
+import { useAuth } from '../context/useAuth.ts';
 import Icon from '../components/Icon.tsx';
 import './Login.css';
 

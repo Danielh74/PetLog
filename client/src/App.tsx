@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.tsx';
 import ProtectedRoute from './components/ProtectedRoute.tsx';
-import { useAuth } from './context/AuthContext.tsx';
+import { useAuth } from './context/useAuth.ts';
 import Landing from './pages/Landing.tsx';
 import Login from './pages/Login.tsx';
 import Dashboard from './pages/Dashboard.tsx';
