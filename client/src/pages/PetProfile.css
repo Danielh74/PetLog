@@ -222,21 +222,6 @@
   font-size: 13px;
   margin-top: 1px;
 }
-.add-record-back {
-  width: 32px;
-  height: 32px;
-  margin-left: -8px;
-}
-.add-record-body {
-  padding: 0 8px;
-}
-.edit-pet-actions {
-  margin-top: 4px;
-}
-.edit-pet-actions .btn {
-  width: auto;
-  flex: 1;
-}
 .empty-state {
   padding: 20px 4px;
   font-size: 14px;
@@ -331,12 +316,6 @@
   }
   .pet-actions-gap {
     display: none;
-  }
-  .edit-pet-actions {
-    flex-wrap: wrap;
-  }
-  .edit-pet-actions .btn {
-    flex: 1 1 100%;
   }
   .topbar-back-link {
     font-size: 14px;

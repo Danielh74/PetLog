@@ -46,7 +46,7 @@
    form column both actions span the field width above them. */
 .auth-submit {
   width: 100%;
-  height: 48px;
+  height: var(--control-h-md);
   margin-top: 4px;
 }
 /* The Google mark is the anchor: centring the pair keeps the label optically

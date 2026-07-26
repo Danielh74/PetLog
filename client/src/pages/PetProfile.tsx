@@ -77,13 +77,8 @@ const AddRecordForm = ({
 
   return (
     <div>
-      <div className="row gap-sm sheet-title">
-        <button className="icon-btn add-record-back" onClick={onCancel}>
-          <Icon name="arrow_back" size={20} />
-        </button>
-        {meta.label}
-      </div>
-      <div className="add-record-body">
+      <div className="sheet-title">{meta.label}</div>
+      <div className="sheet-body">
         <div className="field">
           <label>Title</label>
           <input value={title} onChange={(e) => setTitle(e.target.value)} />
@@ -102,9 +97,16 @@ const AddRecordForm = ({
           <label>Notes (optional)</label>
           <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Dr. Patel · Maple Vet Clinic" />
         </div>
-        <button className="btn btn-primary" onClick={submit}>
-          Save
-        </button>
+        {/* Same action pair as Edit pet: secondary back to the type list,
+            primary to commit. Both dialogs now close the same way. */}
+        <div className="sheet-actions">
+          <button className="btn btn-outline" onClick={onCancel}>
+            Back
+          </button>
+          <button className="btn btn-primary" onClick={submit}>
+            Save
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -136,7 +138,7 @@ const EditPetForm = ({
   return (
     <div>
       <div className="sheet-title">Edit pet</div>
-      <div className="add-record-body">
+      <div className="sheet-body">
         <div className="field">
           <label>Name</label>
           <input value={name} onChange={(e) => setName(e.target.value)} />
@@ -156,12 +158,12 @@ const EditPetForm = ({
           <input value={breed} onChange={(e) => setBreed(e.target.value)} />
         </div>
         <DateInput label="Birthday" value={dob} onChange={setDob} />
-        <div className="row gap-sm edit-pet-actions">
+        <div className="sheet-actions">
           <button className="btn btn-outline" onClick={onCancel}>
             Cancel
           </button>
           <button className="btn btn-primary" onClick={submit}>
-            Save changes
+            Save
           </button>
         </div>
       </div>

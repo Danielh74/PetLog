@@ -211,6 +211,15 @@
 
   /* Focus ring — same in every context so keyboard users learn one signal. */
   --focus-ring: var(--md-ref-primary-30);
+
+  /* ---------- Control scale ----------
+     Two steps, no more. Buttons had drifted to four different heights (36,
+     44, 46, 48) with no rule about which belonged where, so dialogs and forms
+     never quite matched each other.
+       sm  inline actions sharing a row with content
+       md  everything standalone: forms, dialogs, page actions            */
+  --control-h-sm: 36px;
+  --control-h-md: 46px;
 }
 
 /* No dark theme: PetLog ships light-only (see color-scheme above). */
