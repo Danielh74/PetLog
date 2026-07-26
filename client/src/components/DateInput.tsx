@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface DateInputProps {
   label?: string;
@@ -29,8 +29,16 @@ const format = (digits: string): string => {
 
 const DateInput = ({ label, value, onChange, placeholder = 'DD/MM/YYYY' }: DateInputProps) => {
   const [text, setText] = useState(() => (value ? isoToDisplay(value) : ''));
+  const textRef = useRef(text);
+  textRef.current = text;
 
+  // Only adopt the prop when it disagrees with what is already typed.
+  //
+  // A partial entry emits onChange('') because it is not yet a valid date, so
+  // the parent's value becomes ''. Blindly mirroring that back cleared the
+  // box on the first keystroke and made the field impossible to fill in.
   useEffect(() => {
+    if (value === displayToIso(textRef.current)) return;
     setText(value ? isoToDisplay(value) : '');
   }, [value]);
 

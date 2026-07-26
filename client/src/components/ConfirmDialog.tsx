@@ -1,3 +1,5 @@
+import Portal from './Portal.tsx';
+
 interface ConfirmDialogProps {
   title: string;
   message: string;
@@ -17,9 +19,9 @@ const ConfirmDialog = ({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) => (
-  <>
+  <Portal lockScroll>
     <div className="sheet-scrim" onClick={onCancel} />
-    <div className="confirm-dialog">
+    <div className="confirm-dialog" role="dialog" aria-modal="true" aria-label={title}>
       <h3 className="confirm-title">{title}</h3>
       <p className="muted confirm-message">{message}</p>
       <div className="row gap-sm confirm-actions">
@@ -31,7 +33,7 @@ const ConfirmDialog = ({
         </button>
       </div>
     </div>
-  </>
+  </Portal>
 );
 
 export default ConfirmDialog;
