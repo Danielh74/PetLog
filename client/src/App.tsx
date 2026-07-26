@@ -5,7 +5,6 @@ import { useAuth } from './context/AuthContext.tsx';
 import Landing from './pages/Landing.tsx';
 import Login from './pages/Login.tsx';
 import Dashboard from './pages/Dashboard.tsx';
-import Reminders from './pages/Reminders.tsx';
 import Account from './pages/Account.tsx';
 import Onboarding from './pages/Onboarding.tsx';
 import PetProfile from './pages/PetProfile.tsx';
@@ -34,14 +33,9 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/reminders"
-            element={
-              <ProtectedRoute>
-                <Reminders />
-              </ProtectedRoute>
-            }
-          />
+          {/* Reminders are a band of the dashboard now, not their own page.
+              Kept as a redirect so existing links and bookmarks still land. */}
+          <Route path="/reminders" element={<Navigate to="/dashboard#reminders" replace />} />
           <Route
             path="/account"
             element={
