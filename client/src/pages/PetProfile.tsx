@@ -22,6 +22,12 @@ const SPECIES_LABELS: Record<Species, string> = {
   other: 'Other',
 };
 
+const isoToDisplay = (iso: string): string => {
+  const [y, m, d] = iso.slice(0, 10).split('-');
+  if (!y || !m || !d) return '';
+  return `${d}/${m}/${y}`;
+};
+
 const TYPE_META: Record<HealthRecordType, { icon: string; label: string; tone: string }> = {
   vaccination: { icon: 'vaccines', label: 'Vaccination', tone: 'vax' },
   vet_visit: { icon: 'stethoscope', label: 'Vet visit', tone: 'vet' },
@@ -210,7 +216,7 @@ const PetProfile = () => {
     if (!id) return;
     getReminders()
       .then((all) => setReminders(all.filter((r) => (typeof r.pet === 'object' ? r.pet._id : r.pet) === id)))
-      .catch(() => {});
+      .catch(() => { });
   }, [id]);
 
   const markReminderDone = async (reminderId: string) => {
@@ -422,11 +428,11 @@ const PetProfile = () => {
                   <div className="card">
                     <div className="row weight-header">
                       <span className="weight-title">Weight trend</span>
-                      <span className="muted weight-unit">kg</span>
                     </div>
                     <div className="weight-bars">
                       {weightRecords.map((w, i) => (
                         <div key={w._id} className="weight-bar-col">
+                          <span className="muted weight-bar-label">{w.weight} kg</span>
                           <div
                             className={`weight-bar${i === weightRecords.length - 1 ? ' latest' : ''}`}
                             style={{ height: `${10 + ((w.weight - wMin) / Math.max(wMax - wMin, 1)) * 90}%` }}
@@ -520,6 +526,8 @@ const PetProfile = () => {
                             <span className="record-title">{r.title}</span>
                             <span className="muted grow record-date">{formatDate(r.date)}</span>
                           </div>
+                          {r.weight && <div className="muted record-notes">{r.weight} kg</div>}
+                          {r.nextDueDate && <div className="muted record-notes">Next due date at {isoToDisplay(r.nextDueDate)}</div>}
                           {r.notes && <div className="muted record-notes">{r.notes}</div>}
                         </div>
                       </div>
