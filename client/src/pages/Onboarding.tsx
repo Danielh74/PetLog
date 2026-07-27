@@ -78,7 +78,11 @@ const Onboarding = () => {
         name,
         species,
         ...(breed && { breed }),
-        ...(dob && { dob: new Date(dob).toISOString() }),
+        // createPetSchema types dob as z.iso.date() — a calendar day, no time.
+        // toISOString() appended T00:00:00.000Z and the request came back 400,
+        // so any pet given a birthday failed to save. Health records are the
+        // opposite: their `date` is z.iso.datetime() and does want the time.
+        ...(dob && { dob: dob.slice(0, 10) }),
       });
 
       const jobs: Promise<unknown>[] = [];

@@ -131,7 +131,10 @@ const EditPetForm = ({
       name: name.trim(),
       species,
       breed: breed.trim() || undefined,
-      ...(dob && { dob: new Date(dob).toISOString() }),
+      // updatePetSchema wants z.iso.date(), a calendar day with no time. The
+      // pet arrives from the API as a full ISO datetime, so trim it back —
+      // otherwise saving without touching the birthday field returns a 400.
+      ...(dob && { dob: dob.slice(0, 10) }),
     });
   };
 
