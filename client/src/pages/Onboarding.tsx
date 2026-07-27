@@ -91,7 +91,9 @@ const Onboarding = () => {
           jobs.push(createReminder(pet._id, { title: item.title, dueDate: addMonthsToNow(item.addMonths) }));
         }
       }
-      if (weight) {
+      // Positive numbers only: the schema rejects 0 and NaN, and a typo like
+      // "4.5kg" would otherwise be sent as null and 400 silently.
+      if (Number(weight) > 0) {
         jobs.push(
           createRecord(pet._id, {
             type: 'weight',

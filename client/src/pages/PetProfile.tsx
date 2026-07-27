@@ -70,7 +70,9 @@ const AddRecordForm = ({
       title: title.trim() || meta.label,
       date: new Date(date).toISOString(),
       ...(notes && { notes }),
-      ...(type === 'weight' && weight && { weight: Number(weight) }),
+      // The schema wants a positive number. Number('4.5kg') is NaN and
+      // Number('0') is 0 — both come back 400, so only send a real reading.
+      ...(type === 'weight' && Number(weight) > 0 && { weight: Number(weight) }),
       ...(nextDueDate && { nextDueDate: new Date(nextDueDate).toISOString() }),
     });
   };
