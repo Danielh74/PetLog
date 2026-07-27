@@ -33,12 +33,17 @@
   flex-direction: column;
   gap: 18px;
 }
+/* One rhythm for the column instead of a margin on each child. The first
+   child used to carry an 18px top margin, which started this column 18px
+   below the health log beside it — the two never lined up. */
 .profile-col-main {
   display: flex;
   flex-direction: column;
+  gap: 14px;
 }
+/* Matches .card exactly so both columns share a top and bottom edge. */
 .profile-col-log {
-  padding: 16px 16px 8px;
+  padding: 16px;
 }
 .health-log-header {
   margin-bottom: 12px;
@@ -50,14 +55,11 @@
 .log-add-btn {
   width: 32px;
   height: 32px;
-  background: var(--md-sys-color-primary-container);
-  color: var(--md-sys-color-on-primary-container);
+  background: var(--icon-container);
+  color: var(--text-body);
 }
 .log-add-btn:hover {
   filter: brightness(1.06);
-}
-.filter-row {
-  margin: 0 0 14px;
 }
 @media (min-width: 860px) {
   .profile-columns {
@@ -81,7 +83,6 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
-  margin: 18px 0 6px;
 }
 .stat-card {
   text-align: center;
@@ -97,9 +98,6 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.4px;
-}
-.weight-card {
-  margin-top: 14px;
 }
 .weight-header {
   gap: 8px;
@@ -127,14 +125,16 @@
   height: 100%;
   justify-content: flex-end;
 }
+/* Chart, not a control: neutral bars with the newest reading in secondary,
+   so nothing here competes with the page's actual call to action. */
 .weight-bar {
   width: 100%;
   max-width: 26px;
   border-radius: 8px 8px 4px 4px;
-  background: var(--md-sys-color-primary-container);
+  background: var(--md-sys-color-surface-container-highest);
 }
 .weight-bar.latest {
-  background: var(--brand);
+  background: var(--md-sys-color-secondary);
 }
 .weight-bar-label {
   font-size: 10.5px;
@@ -144,41 +144,48 @@
   position: relative;
   padding-left: 6px;
 }
+/* One baseline for icon, title and date: the icon column is a fixed width so
+   every title starts on the same x, whatever the record type. */
 .record-row {
   align-items: flex-start;
   padding-bottom: 16px;
+  gap: 12px;
 }
 .record-icon-col {
   align-items: center;
   flex: none;
+  width: 38px;
 }
 .record-icon {
   width: 38px;
   height: 38px;
 }
+/* Record-type tints, same rule as the species swatches: pale wash + dark ink,
+   always next to the type's own icon. Makes a long timeline scannable at a
+   glance without any of it competing with a button. */
 .tone-vax {
-  background: var(--md-sys-color-primary-container);
-  color: var(--md-sys-color-on-primary-container);
+  background: var(--tint-vax);
+  color: var(--tint-vax-ink);
 }
 .tone-vet {
-  background: var(--md-sys-color-secondary-container);
-  color: var(--md-sys-color-on-secondary-container);
+  background: var(--tint-vet);
+  color: var(--tint-vet-ink);
 }
 .tone-med {
-  background: var(--md-sys-color-tertiary-container);
-  color: var(--md-sys-color-on-tertiary-container);
+  background: var(--tint-med);
+  color: var(--tint-med-ink);
 }
 .tone-wt {
-  background: var(--md-sys-color-surface-variant);
-  color: var(--md-sys-color-on-surface-variant);
+  background: var(--tint-weight);
+  color: var(--tint-weight-ink);
 }
 .tone-groom {
-  background: var(--md-sys-color-tertiary-container);
-  color: var(--md-sys-color-on-tertiary-container);
+  background: var(--tint-groom);
+  color: var(--tint-groom-ink);
 }
 .tone-other {
-  background: var(--md-sys-color-surface-variant);
-  color: var(--md-sys-color-on-surface-variant);
+  background: var(--icon-container);
+  color: var(--on-icon-container);
 }
 .record-line {
   width: 2px;
@@ -193,35 +200,27 @@
   padding-top: 1px;
 }
 .record-title-row {
-  gap: 8px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
 }
 .record-title {
   font-weight: 600;
   font-size: 15px;
+  flex: 1;
+  min-width: 0;
 }
+/* Pinned to a shared right edge instead of trailing whatever the title left. */
 .record-date {
   font-size: 12px;
   text-align: right;
   white-space: nowrap;
+  flex: none;
+  margin-left: auto;
 }
 .record-notes {
   font-size: 13px;
   margin-top: 1px;
-}
-.add-record-back {
-  width: 32px;
-  height: 32px;
-  margin-left: -8px;
-}
-.add-record-body {
-  padding: 0 8px;
-}
-.edit-pet-actions {
-  margin-top: 4px;
-}
-.edit-pet-actions .btn {
-  width: auto;
-  flex: 1;
 }
 .empty-state {
   padding: 20px 4px;
@@ -230,4 +229,171 @@
 .care-toggle-title {
   font-weight: 600;
   font-size: 15px;
+}
+
+/* Responsive rules for this page live in one block at the end of the file. */
+
+/* ---------- This pet's reminders ----------
+   The dashboard lists reminders for every animal; here they are scoped to
+   one, so the owner does not have to hold the filtering in their head. */
+.pet-reminders-header {
+  margin-bottom: 10px;
+}
+.pet-reminders-title {
+  font-weight: 600;
+  font-size: 15px;
+}
+.pet-reminders-count {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.pet-reminders-empty {
+  font-size: 13.5px;
+  margin: 4px 0 0;
+}
+.pet-reminder-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 0;
+  border-top: 1px solid var(--border);
+}
+.pet-reminder-row.overdue {
+  color: var(--status-alert);
+}
+.pet-reminder-title {
+  font-size: 14px;
+  font-weight: 500;
+}
+.pet-reminder-due {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+.pet-reminder-row.overdue .pet-reminder-due {
+  color: inherit;
+  font-weight: 600;
+}
+
+/* ---------- Pet actions row ----------
+   Wraps rather than overflows. The gap pushes Edit/Delete away from the two
+   safe actions so a mis-tap does not land on Delete. */
+.pet-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0 0 20px;
+}
+.pet-actions-gap {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 599px) {
+  .profile-avatar {
+    width: 58px;
+    height: 58px;
+  }
+  .profile-name {
+    font-size: 21px;
+  }
+  /* Three stat cards at 320px leave ~90px each — stack to two rows instead. */
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .weight-bars {
+    height: 70px;
+    gap: 6px;
+  }
+  .record-icon {
+    width: 34px;
+    height: 34px;
+  }
+  /* Two safe actions on the first row, the two destructive-adjacent ones on
+     the second — the spacer collapses so the split stays predictable. */
+  .pet-actions .btn {
+    flex: 1 1 calc(50% - 4px);
+  }
+  .pet-actions-gap {
+    display: none;
+  }
+  .topbar-back-link {
+    font-size: 14px;
+  }
+}
+
+/* ---------- Health-log filters ----------
+   A wrapping row, not a horizontal scroller: options that need a swipe to
+   discover may as well not be there. */
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin: 0 0 14px;
+}
+.filter-row .pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.filter-menu-anchor {
+  position: relative;
+  display: inline-flex;
+}
+.filter-more {
+  padding: 7px 10px;
+}
+.filter-more.open {
+  border-color: var(--brand);
+  color: var(--text-body);
+}
+.filter-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 15;
+  min-width: 168px;
+  padding: 6px;
+  background: var(--md-sys-color-surface-container-high);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+.filter-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: var(--pawly-font-body);
+  font-size: 14px;
+  color: var(--text-body);
+  text-align: left;
+}
+.filter-menu-item:hover {
+  background: var(--md-sys-color-surface-container-highest);
+}
+.filter-menu-item.active {
+  font-weight: 600;
+}
+.menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 14;
+}
+
+.sheet-error {
+  margin: 0 8px 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--md-sys-color-error-container);
+  color: var(--md-sys-color-on-error-container);
+  font-size: 13.5px;
+  line-height: 1.4;
 }

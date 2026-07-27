@@ -1,13 +1,13 @@
 import type { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.tsx';
+import { useAuth } from '../context/useAuth.ts';
 
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   const { firebaseUser, loading } = useAuth();
 
   if (loading) {
     return (
-      <div className="app-shell center fill-center">
+      <div className="route-loading" role="status" aria-label="Loading">
         <span className="spinner" />
       </div>
     );

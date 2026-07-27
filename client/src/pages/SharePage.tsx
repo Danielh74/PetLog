@@ -12,11 +12,17 @@ const SharePage = () => {
   const [pet, setPet] = useState<Pet | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [loading, setLoading] = useState(true);
+  // Captured when the record lands rather than read during render — reading
+  // the clock mid-render makes the same props produce different output.
+  const [now, setNow] = useState(0);
 
   useEffect(() => {
     if (!token) return;
     getPublicPet(token)
-      .then(setPet)
+      .then((p) => {
+        setNow(Date.now());
+        setPet(p);
+      })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
   }, [token]);
@@ -44,7 +50,7 @@ const SharePage = () => {
 
   const vaxStatus = (nextDueDate?: string) => {
     if (!nextDueDate) return { label: 'Current', watch: false };
-    const days = Math.round((+new Date(nextDueDate) - Date.now()) / (24 * 60 * 60 * 1000));
+    const days = Math.round((+new Date(nextDueDate) - now) / (24 * 60 * 60 * 1000));
     if (days < 0) return { label: `Overdue since ${formatDate(nextDueDate)}`, watch: true };
     if (days <= 30) return { label: `Due ${formatDate(nextDueDate)}`, watch: true };
     return { label: `Current · next ${formatDate(nextDueDate)}`, watch: false };

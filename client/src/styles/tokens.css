@@ -10,6 +10,10 @@
    ============================================================ */
 
 :root {
+  /* Light-only product. Declared so form controls, scrollbars and
+     autofill stay light even when the OS is set to dark. */
+  color-scheme: light;
+
   /* ---------- Reference palettes (tones 0–100) ---------- */
   /* Primary — teal / green */
   --md-ref-primary-0: #000000;
@@ -166,90 +170,56 @@
   --border: var(--md-sys-color-outline-variant);
   --border-strong: var(--md-sys-color-outline);
 
-  /* Functional health-status colors (pet vitals) */
-  --status-healthy: #2e8b6f;
-  --status-watch: #c9881e;
-  --status-alert: var(--md-sys-color-error);
+  /* Functional health-status colors (pet vitals).
+     Darkened from the design bundle so each clears 4.5:1 as text on our
+     light surfaces — the original mid-tones sat at ~2.9:1 and ~3.6:1. */
+  --status-healthy: #0f6b52; /* 6.1:1 on --surface */
+  --status-watch: #7a4f00; /* 6.8:1 on --surface */
+  --status-alert: var(--md-sys-color-error); /* 6.1:1 on --surface */
+
+  /* Neutral container for decorative icons where no category applies. */
+  --icon-container: var(--md-sys-color-surface-container-highest);
+  --on-icon-container: var(--md-sys-color-on-surface-variant);
+
+  /* ---------- Category tints ----------
+     Species and record types get their own hue so a list is scannable. Every
+     one is a pale wash carrying dark ink, never a saturated fill: a filled
+     button is the only thing on screen at full chroma, so these read as
+     labelling rather than as something to click. Each ink clears 4.5:1 on its
+     own tint. Colour is always paired with an icon — never the only signal. */
+  --tint-dog: #e8f0fe;
+  --tint-dog-ink: #14477d;
+  --tint-cat: #fdeceb;
+  --tint-cat-ink: #8a2f22;
+  --tint-bird: #fff4e0;
+  --tint-bird-ink: #7a4f00;
+  --tint-rabbit: #f0eafc;
+  --tint-rabbit-ink: #4b2d7f;
+  --tint-other: #e9f2ef;
+  --tint-other-ink: #2b4a42;
+
+  --tint-vax: #e4f2ec;
+  --tint-vax-ink: #14503c;
+  --tint-vet: #e8f0fe;
+  --tint-vet-ink: #14477d;
+  --tint-med: #f0eafc;
+  --tint-med-ink: #4b2d7f;
+  --tint-weight: #fff4e0;
+  --tint-weight-ink: #7a4f00;
+  --tint-groom: #fdeceb;
+  --tint-groom-ink: #8a2f22;
+
+  /* Focus ring — same in every context so keyboard users learn one signal. */
+  --focus-ring: var(--md-ref-primary-30);
+
+  /* ---------- Control scale ----------
+     Two steps, no more. Buttons had drifted to four different heights (36,
+     44, 46, 48) with no rule about which belonged where, so dialogs and forms
+     never quite matched each other.
+       sm  inline actions sharing a row with content
+       md  everything standalone: forms, dialogs, page actions            */
+  --control-h-sm: 36px;
+  --control-h-md: 46px;
 }
 
-/* ---------- Dark theme overrides ---------- */
-:root[data-theme='dark'] {
-  --md-sys-color-primary: var(--md-ref-primary-80);
-  --md-sys-color-on-primary: var(--md-ref-primary-20);
-  --md-sys-color-primary-container: var(--md-ref-primary-30);
-  --md-sys-color-on-primary-container: var(--md-ref-primary-90);
-  --md-sys-color-secondary: var(--md-ref-secondary-80);
-  --md-sys-color-on-secondary: var(--md-ref-secondary-20);
-  --md-sys-color-secondary-container: var(--md-ref-secondary-30);
-  --md-sys-color-on-secondary-container: var(--md-ref-secondary-90);
-  --md-sys-color-tertiary: var(--md-ref-tertiary-80);
-  --md-sys-color-on-tertiary: var(--md-ref-tertiary-20);
-  --md-sys-color-tertiary-container: var(--md-ref-tertiary-30);
-  --md-sys-color-on-tertiary-container: var(--md-ref-tertiary-90);
-  --md-sys-color-error: var(--md-ref-error-80);
-  --md-sys-color-on-error: var(--md-ref-error-20);
-  --md-sys-color-error-container: var(--md-ref-error-30);
-  --md-sys-color-on-error-container: var(--md-ref-error-90);
-  --md-sys-color-background: var(--md-ref-neutral-10);
-  --md-sys-color-on-background: var(--md-ref-neutral-90);
-  --md-sys-color-surface: var(--md-ref-neutral-10);
-  --md-sys-color-on-surface: var(--md-ref-neutral-90);
-  --md-sys-color-surface-variant: var(--md-ref-neutral-variant-30);
-  --md-sys-color-on-surface-variant: var(--md-ref-neutral-variant-80);
-  --md-sys-color-outline: var(--md-ref-neutral-variant-60);
-  --md-sys-color-outline-variant: var(--md-ref-neutral-variant-30);
-  --md-sys-color-surface-dim: #0e1513;
-  --md-sys-color-surface-bright: #343b38;
-  --md-sys-color-surface-container-lowest: #0b1210;
-  --md-sys-color-surface-container-low: #171d1b;
-  --md-sys-color-surface-container: #1b211f;
-  --md-sys-color-surface-container-high: #252b29;
-  --md-sys-color-surface-container-highest: #303633;
-  --md-sys-color-inverse-surface: var(--md-ref-neutral-90);
-  --md-sys-color-inverse-on-surface: var(--md-ref-neutral-20);
-  --status-healthy: #64bca9;
-  --status-watch: #f4c13d;
-  --status-alert: #ffb4ab;
-}
-
-/* Respect system preference when the user hasn't chosen explicitly */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --md-sys-color-primary: var(--md-ref-primary-80);
-    --md-sys-color-on-primary: var(--md-ref-primary-20);
-    --md-sys-color-primary-container: var(--md-ref-primary-30);
-    --md-sys-color-on-primary-container: var(--md-ref-primary-90);
-    --md-sys-color-secondary: var(--md-ref-secondary-80);
-    --md-sys-color-on-secondary: var(--md-ref-secondary-20);
-    --md-sys-color-secondary-container: var(--md-ref-secondary-30);
-    --md-sys-color-on-secondary-container: var(--md-ref-secondary-90);
-    --md-sys-color-tertiary: var(--md-ref-tertiary-80);
-    --md-sys-color-on-tertiary: var(--md-ref-tertiary-20);
-    --md-sys-color-tertiary-container: var(--md-ref-tertiary-30);
-    --md-sys-color-on-tertiary-container: var(--md-ref-tertiary-90);
-    --md-sys-color-error: var(--md-ref-error-80);
-    --md-sys-color-on-error: var(--md-ref-error-20);
-    --md-sys-color-error-container: var(--md-ref-error-30);
-    --md-sys-color-on-error-container: var(--md-ref-error-90);
-    --md-sys-color-background: var(--md-ref-neutral-10);
-    --md-sys-color-on-background: var(--md-ref-neutral-90);
-    --md-sys-color-surface: var(--md-ref-neutral-10);
-    --md-sys-color-on-surface: var(--md-ref-neutral-90);
-    --md-sys-color-surface-variant: var(--md-ref-neutral-variant-30);
-    --md-sys-color-on-surface-variant: var(--md-ref-neutral-variant-80);
-    --md-sys-color-outline: var(--md-ref-neutral-variant-60);
-    --md-sys-color-outline-variant: var(--md-ref-neutral-variant-30);
-    --md-sys-color-surface-dim: #0e1513;
-    --md-sys-color-surface-bright: #343b38;
-    --md-sys-color-surface-container-lowest: #0b1210;
-    --md-sys-color-surface-container-low: #171d1b;
-    --md-sys-color-surface-container: #1b211f;
-    --md-sys-color-surface-container-high: #252b29;
-    --md-sys-color-surface-container-highest: #303633;
-    --md-sys-color-inverse-surface: var(--md-ref-neutral-90);
-    --md-sys-color-inverse-on-surface: var(--md-ref-neutral-20);
-    --status-healthy: #64bca9;
-    --status-watch: #f4c13d;
-    --status-alert: #ffb4ab;
-  }
-}
+/* No dark theme: PetLog ships light-only (see color-scheme above). */

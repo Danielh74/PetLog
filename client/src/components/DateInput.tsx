@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface DateInputProps {
   label?: string;
@@ -29,16 +29,28 @@ const format = (digits: string): string => {
 
 const DateInput = ({ label, value, onChange, placeholder = 'DD/MM/YYYY' }: DateInputProps) => {
   const [text, setText] = useState(() => (value ? isoToDisplay(value) : ''));
+  // The last ISO this field itself sent upward. Written only from the change
+  // handler, read only from the effect — never touched during render.
+  const emitted = useRef<string | null>(value ?? null);
 
+  // Adopt `value` only when it did not come from us.
+  //
+  // A partial entry is not a valid date, so the handler emits ''. The parent
+  // sets value to '', and mirroring that back cleared the box on the first
+  // keystroke — the field could not be filled in at all. Ignoring our own
+  // echo keeps typing intact while still following a genuine outside change.
   useEffect(() => {
+    if (value === emitted.current) return;
     setText(value ? isoToDisplay(value) : '');
   }, [value]);
 
   const handleChange = (raw: string) => {
     const digits = raw.replace(/\D/g, '').slice(0, 8);
     const formatted = format(digits);
+    const iso = digits.length === 8 ? displayToIso(formatted) : '';
     setText(formatted);
-    onChange(digits.length === 8 ? displayToIso(formatted) : '');
+    emitted.current = iso;
+    onChange(iso);
   };
 
   return (

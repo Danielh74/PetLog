@@ -91,8 +91,8 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  background: var(--brand-soft);
-  color: var(--md-sys-color-on-primary-container);
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
   padding: 7px 14px;
   border-radius: 999px;
   font-size: 13px;
@@ -131,64 +131,90 @@
   flex: 0 1 auto;
 }
 
+/* Plain container. It used to be a filled brand gradient, which is what made
+   this half of the hero shout louder than the buttons on the other half.
+   Stretch so the card shares both edges with the column opposite: its top
+   meets the chip, its bottom meets the CTA row (which sits on margin-top:auto). */
 .landing-hero-right {
-  background: linear-gradient(150deg, var(--brand), color-mix(in srgb, var(--brand) 68%, #000));
-  border-radius: 22px;
-  padding: 22px;
-  color: #fff;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.16);
+  display: flex;
+  align-items: stretch;
 }
 
-.landing-verdict-card {
+/* ---------- Hero preview ----------
+   A quiet, outlined sample of a record. The previous card was a filled brand
+   panel carrying its own urgency headline, which competed with the hero CTAs
+   for the same attention. Brand fill stays with the buttons. */
+.landing-preview {
+  width: 100%;
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
 }
 
-.landing-card-row {
-  background: rgba(255, 255, 255, 0.13);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 12px;
-  padding: 13px;
+.landing-preview-head {
   display: flex;
   align-items: center;
   gap: 11px;
-  font-size: 14px;
+  flex: none;
+  padding-bottom: 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border);
 }
 
-.landing-card-row.alert {
-  background: #fff;
-  color: #7c241a;
-  border: none;
-  font-weight: 600;
+.landing-preview-avatar {
+  width: 40px;
+  height: 40px;
 }
 
-.landing-urgency {
-  background: #fff;
-  color: var(--text-body);
-  border-radius: 12px;
-  padding: 15px;
-  margin-top: 4px;
-}
-
-.landing-urgency-tag {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--status-watch);
-}
-
-.landing-urgency-headline {
+.landing-preview-name {
   font-family: var(--pawly-font-display);
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 600;
-  margin: 4px 0 3px;
+  color: var(--text-body);
 }
 
-.landing-urgency-body {
+.landing-preview-meta {
   font-size: 13px;
   color: var(--text-muted);
+}
+
+/* The rows absorb the extra height rather than the gaps between them, so a
+   taller card reads as generous rows instead of drifting apart. */
+.landing-preview-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex: 1;
+  min-height: 46px;
+  padding: 11px 13px;
+  border-radius: 12px;
+  background: var(--md-sys-color-surface);
+  border: 1px solid var(--border);
+  font-size: 14px;
+  color: var(--text-body);
+}
+
+.landing-preview-row.overdue {
+  background: var(--md-sys-color-error-container);
+  color: var(--md-sys-color-on-error-container);
+  border-color: transparent;
+  font-weight: 600;
+}
+
+.landing-preview-icon {
+  color: var(--text-muted);
+}
+
+.landing-preview-when {
+  margin-left: auto;
+  font-size: 12.5px;
+  white-space: nowrap;
+  opacity: 0.85;
 }
 
 .landing-section {
@@ -254,31 +280,29 @@
   flex: none;
 }
 
-.landing-feature-icon.tone-fol {
-  background: var(--md-sys-color-primary-container);
-  color: var(--md-sys-color-on-primary-container);
-}
-
-.landing-feature-icon.tone-not {
-  background: var(--md-sys-color-secondary-container);
-  color: var(--md-sys-color-on-secondary-container);
-}
-
+.landing-feature-icon.tone-fol,
+.landing-feature-icon.tone-not,
 .landing-feature-icon.tone-aut {
-  background: var(--md-sys-color-tertiary-container);
-  color: var(--md-sys-color-on-tertiary-container);
+  background: var(--icon-container);
+  color: var(--on-icon-container);
 }
 
+/* Same track and same card as .landing-features above, so the two sections
+   share one set of column edges. They used to differ (260 vs 280px track,
+   20 vs 22px padding, no background) and read as two separate layouts. */
 .landing-steps {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 16px;
 }
 
 .landing-step-card {
-  padding: 20px;
-  border-radius: 18px;
+  background: var(--surface-card);
   border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
 }
 
 .landing-step-number {
@@ -287,8 +311,8 @@
   width: 34px;
   height: 34px;
   border-radius: 999px;
-  background: var(--brand);
-  color: var(--md-sys-color-on-primary);
+  background: var(--md-sys-color-secondary);
+  color: var(--md-sys-color-on-secondary);
   font-weight: 700;
   font-size: 15px;
   margin-bottom: 12px;
@@ -306,22 +330,6 @@
   margin: 0;
   font-size: 14px;
   color: var(--text-muted);
-}
-
-.landing-trust {
-  display: flex;
-  gap: 12px;
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 20px 32px 46px;
-  background: var(--md-sys-color-surface-container-high);
-  border-radius: 18px;
-  font-size: 14px;
-  color: var(--text-muted);
-}
-
-.landing-trust span {
-  flex: 1;
 }
 
 .landing-cta-band {
@@ -360,10 +368,18 @@
   filter: brightness(0.96);
 }
 
+/* The default ring is dark teal, which disappears against the brand band —
+   invert it on the inverted surfaces. */
+.landing-cta-band :focus-visible {
+  outline-color: #fff;
+}
+
+/* The footer is the page's base, so it meets the CTA band with real breathing
+   room instead of the 10px sliver that read as a mistake. */
 .landing-footer {
   border-top: 1px solid var(--border);
   background: var(--md-sys-color-surface-container-low);
-  margin-top: 10px;
+  margin-top: 56px;
 }
 
 .landing-footer-content {
@@ -428,4 +444,97 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 899px) {
+  .landing-hero {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 44px 24px 36px;
+  }
+  .landing-header {
+    padding: 0 24px;
+  }
+  .landing-section {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+  .landing-cta-band {
+    margin-left: 24px;
+    margin-right: 24px;
+  }
+  .landing-footer-content {
+    padding: 30px 24px;
+  }
+}
+
+@media (max-width: 599px) {
+  .landing-header {
+    padding: 0 16px;
+    gap: 10px;
+  }
+  /* Both actions stay: hiding "Log in" would leave a returning user with no
+     obvious way back into their account. Tighten them instead. */
+  .landing-actions {
+    gap: 4px;
+  }
+  .landing-actions .btn-text {
+    padding: 0 10px;
+    font-size: 13.5px;
+  }
+  .landing-actions .btn {
+    padding: 0 14px;
+    font-size: 13.5px;
+  }
+  .landing-wordmark {
+    font-size: 18px;
+  }
+  .landing-hero {
+    padding: 32px 16px 28px;
+    gap: 26px;
+  }
+  .landing-headline {
+    font-size: 32px;
+  }
+  .landing-subtext {
+    font-size: 15px;
+  }
+  /* Stacked full-width CTAs beat two half-width buttons on a narrow screen. */
+  .landing-ctas {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .landing-ctas .btn {
+    width: 100%;
+  }
+  .landing-section {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .landing-section-header h2 {
+    font-size: 24px;
+  }
+  .landing-cta-band {
+    margin-left: 16px;
+    margin-right: 16px;
+    padding: 32px 20px;
+  }
+  .landing-cta-band h2 {
+    font-size: 22px;
+  }
+  .landing-footer-content {
+    padding: 26px 16px;
+    gap: 22px 18px;
+  }
+  /* Two columns of links instead of four cramped ones. */
+  .landing-footer-col {
+    flex: 1 1 40%;
+    min-width: 0;
+  }
+  .landing-footer-bottom {
+    padding-left: 16px;
+    padding-right: 16px;
+    flex-wrap: wrap;
+  }
 }

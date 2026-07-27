@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.tsx';
+import { useAuth } from '../context/useAuth.ts';
 import Icon from '../components/Icon.tsx';
 import './Login.css';
 
@@ -124,7 +124,7 @@ const Login = () => {
             <span className="grow divider-line" />
           </div>
 
-          <button className="btn btn-outline auth-submit" onClick={handleGoogle} disabled={busy}>
+          <button className="btn btn-outline auth-submit auth-google" onClick={handleGoogle} disabled={busy}>
             <Icon name="login" size={19} />
             Continue with Google
           </button>
