@@ -210,6 +210,16 @@
   flex: 1;
   min-width: 0;
 }
+/* Not rendered at all until the row is hovered, so the timeline stays clean
+   at rest. */
+.record-actions {
+  display: none;
+  flex: none;
+  gap: 2px;
+}
+.record-row:hover .record-actions {
+  display: flex;
+}
 /* Pinned to a shared right edge instead of trailing whatever the title left. */
 .record-date {
   font-size: 12px;
