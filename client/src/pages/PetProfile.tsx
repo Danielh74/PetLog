@@ -8,8 +8,8 @@ import AppLayout from '../components/AppLayout.tsx';
 import Portal from '../components/Portal.tsx';
 import { useToast } from '../utils/useToast.ts';
 import { getPet, updatePet, deletePet, type UpdatePetInput } from '../api/pets.ts';
-import { createRecord, type CreateRecordInput } from '../api/records.ts';
-import { getReminders, updateReminder } from '../api/reminders.ts';
+import { createRecord, updateRecord, deleteRecord, type CreateRecordInput } from '../api/records.ts';
+import { getReminders, createReminder, updateReminder } from '../api/reminders.ts';
 import type { HealthRecord, HealthRecordType, Pet, Reminder, Species } from '../types/index.ts';
 import { ageFromDob, formatDate, relativeDue, speciesIcon, speciesLabel } from '../utils/petMeta.ts';
 import './PetProfile.css';
@@ -20,6 +20,12 @@ const SPECIES_LABELS: Record<Species, string> = {
   bird: 'Bird',
   rabbit: 'Rabbit',
   other: 'Other',
+};
+
+const isoToDisplay = (iso: string): string => {
+  const [y, m, d] = iso.slice(0, 10).split('-');
+  if (!y || !m || !d) return '';
+  return `${d}/${m}/${y}`;
 };
 
 const TYPE_META: Record<HealthRecordType, { icon: string; label: string; tone: string }> = {
@@ -50,19 +56,21 @@ const OVERFLOW_FILTERS: { id: FilterId; label: string }[] = [
 
 const AddRecordForm = ({
   type,
+  initial,
   onCancel,
   onSaved,
 }: {
   type: HealthRecordType;
+  initial?: HealthRecord;
   onCancel: () => void;
   onSaved: (input: CreateRecordInput) => void;
 }) => {
   const meta = TYPE_META[type];
-  const [title, setTitle] = useState(meta.label);
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
-  const [notes, setNotes] = useState('');
-  const [weight, setWeight] = useState('');
-  const [nextDueDate, setNextDueDate] = useState('');
+  const [title, setTitle] = useState(initial?.title ?? meta.label);
+  const [date, setDate] = useState(initial ? initial.date.slice(0, 10) : new Date().toISOString().slice(0, 10));
+  const [notes, setNotes] = useState(initial?.notes ?? '');
+  const [weight, setWeight] = useState(initial?.weight != null ? String(initial.weight) : '');
+  const [nextDueDate, setNextDueDate] = useState(initial?.nextDueDate ? initial.nextDueDate.slice(0, 10) : '');
 
   const submit = () => {
     onSaved({
@@ -79,7 +87,7 @@ const AddRecordForm = ({
 
   return (
     <div>
-      <div className="sheet-title">{meta.label}</div>
+      <div className="sheet-title">{initial ? `Edit ${meta.label.toLowerCase()}` : meta.label}</div>
       <div className="sheet-body">
         <div className="field">
           <label>Title</label>
@@ -99,11 +107,11 @@ const AddRecordForm = ({
           <label>Notes (optional)</label>
           <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Dr. Patel · Maple Vet Clinic" />
         </div>
-        {/* Same action pair as Edit pet: secondary back to the type list,
-            primary to commit. Both dialogs now close the same way. */}
+        {/* Same action pair as Edit pet: secondary back to the type list (or
+            cancel outright when editing), primary to commit. */}
         <div className="sheet-actions">
           <button className="btn btn-outline" onClick={onCancel}>
-            Back
+            {initial ? 'Cancel' : 'Back'}
           </button>
           <button className="btn btn-primary" onClick={submit}>
             Save
@@ -190,6 +198,9 @@ const PetProfile = () => {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetError, setSheetError] = useState('');
   const [chosenType, setChosenType] = useState<HealthRecordType | null>(null);
+  const [editingRecord, setEditingRecord] = useState<HealthRecord | null>(null);
+  const [deletingRecord, setDeletingRecord] = useState<HealthRecord | null>(null);
+  const [deletingRecordBusy, setDeletingRecordBusy] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -206,12 +217,14 @@ const PetProfile = () => {
 
   // There is no per-pet reminders endpoint, so scope the full list here.
   // A failure is silent: reminders are secondary to the record itself.
-  useEffect(() => {
+  const loadReminders = () => {
     if (!id) return;
     getReminders()
       .then((all) => setReminders(all.filter((r) => (typeof r.pet === 'object' ? r.pet._id : r.pet) === id)))
-      .catch(() => {});
-  }, [id]);
+      .catch(() => { });
+  };
+
+  useEffect(loadReminders, [id]);
 
   const markReminderDone = async (reminderId: string) => {
     setReminders((prev) => prev.map((r) => (r._id === reminderId ? { ...r, isDone: true } : r)));
@@ -226,6 +239,14 @@ const PetProfile = () => {
     setSheetOpen(false);
     setChosenType(null);
     setSheetError('');
+    setEditingRecord(null);
+  };
+
+  const openEditRecord = (record: HealthRecord) => {
+    setSheetError('');
+    setEditingRecord(record);
+    setChosenType(record.type);
+    setSheetOpen(true);
   };
 
   // A rejected save used to reject silently: the sheet stayed open with no
@@ -239,9 +260,56 @@ const PetProfile = () => {
       setSheetError('Could not save this record. Check the details and try again.');
       return;
     }
+    // Vaccinations and medications are the two record types that carry a
+    // "next due" date — turn that into a reminder automatically instead of
+    // making the user re-enter the same date on the Reminders screen. Best
+    // effort: the health record itself already saved, so a reminder failure
+    // shouldn't block the success path.
+    const reminderDue = (input.type === 'vaccination' || input.type === 'medication') && input.nextDueDate;
+    if (reminderDue) {
+      try {
+        await createReminder(id, { title: `${input.title} due`, dueDate: input.nextDueDate! });
+        loadReminders();
+      } catch {
+        // ignore — the health record saved fine
+      }
+    }
     closeSheet();
-    showToast(`${TYPE_META[input.type].label} added to ${pet?.name}'s log`);
+    showToast(
+      reminderDue
+        ? `${TYPE_META[input.type].label} added — reminder set for ${isoToDisplay(input.nextDueDate!)}`
+        : `${TYPE_META[input.type].label} added to ${pet?.name}'s log`,
+    );
     load();
+  };
+
+  const handleUpdateRecord = async (input: CreateRecordInput) => {
+    if (!id || !editingRecord) return;
+    setSheetError('');
+    try {
+      await updateRecord(id, editingRecord._id, input);
+    } catch {
+      setSheetError('Could not save these changes. Check the details and try again.');
+      return;
+    }
+    closeSheet();
+    showToast('Record updated');
+    load();
+  };
+
+  const handleDeleteRecord = async () => {
+    if (!id || !deletingRecord) return;
+    setDeletingRecordBusy(true);
+    try {
+      await deleteRecord(id, deletingRecord._id);
+      setDeletingRecord(null);
+      showToast('Record deleted');
+      load();
+    } catch {
+      showToast('Could not delete this record. Please try again.');
+    } finally {
+      setDeletingRecordBusy(false);
+    }
   };
 
   const handleShare = async () => {
@@ -422,11 +490,11 @@ const PetProfile = () => {
                   <div className="card">
                     <div className="row weight-header">
                       <span className="weight-title">Weight trend</span>
-                      <span className="muted weight-unit">kg</span>
                     </div>
                     <div className="weight-bars">
                       {weightRecords.map((w, i) => (
                         <div key={w._id} className="weight-bar-col">
+                          <span className="muted weight-bar-label">{w.weight} kg</span>
                           <div
                             className={`weight-bar${i === weightRecords.length - 1 ? ' latest' : ''}`}
                             style={{ height: `${10 + ((w.weight - wMin) / Math.max(wMax - wMin, 1)) * 90}%` }}
@@ -519,7 +587,25 @@ const PetProfile = () => {
                           <div className="row record-title-row">
                             <span className="record-title">{r.title}</span>
                             <span className="muted grow record-date">{formatDate(r.date)}</span>
+                            <div className="row record-actions">
+                              <button
+                                className="icon-btn icon-btn-sm"
+                                onClick={() => openEditRecord(r)}
+                                aria-label={`Edit "${r.title}"`}
+                              >
+                                <Icon name="edit" size={16} />
+                              </button>
+                              <button
+                                className="icon-btn icon-btn-sm"
+                                onClick={() => setDeletingRecord(r)}
+                                aria-label={`Delete "${r.title}"`}
+                              >
+                                <Icon name="delete" size={16} />
+                              </button>
+                            </div>
                           </div>
+                          {r.weight && <div className="muted record-notes">{r.weight} kg</div>}
+                          {r.nextDueDate && <div className="muted record-notes">Next due date at {isoToDisplay(r.nextDueDate)}</div>}
                           {r.notes && <div className="muted record-notes">{r.notes}</div>}
                         </div>
                       </div>
@@ -534,7 +620,7 @@ const PetProfile = () => {
         {sheetOpen && (
           <Portal lockScroll>
             <div className="sheet-scrim" onClick={closeSheet} />
-            <div className="sheet" role="dialog" aria-modal="true" aria-label="Add a record">
+            <div className="sheet" role="dialog" aria-modal="true" aria-label={editingRecord ? 'Edit record' : 'Add a record'}>
               {!chosenType ? (
                 <>
                   <div className="sheet-title">Add a record</div>
@@ -551,11 +637,28 @@ const PetProfile = () => {
               ) : (
                 <>
                   {sheetError && <p className="sheet-error">{sheetError}</p>}
-                  <AddRecordForm type={chosenType} onCancel={() => setChosenType(null)} onSaved={handleSaveRecord} />
+                  <AddRecordForm
+                    type={chosenType}
+                    initial={editingRecord ?? undefined}
+                    onCancel={editingRecord ? closeSheet : () => setChosenType(null)}
+                    onSaved={editingRecord ? handleUpdateRecord : handleSaveRecord}
+                  />
                 </>
               )}
             </div>
           </Portal>
+        )}
+
+        {deletingRecord && (
+          <ConfirmDialog
+            title="Delete this record?"
+            message={`This permanently removes "${deletingRecord.title}" from ${pet.name}'s health log.`}
+            confirmLabel="Delete"
+            danger
+            busy={deletingRecordBusy}
+            onCancel={() => setDeletingRecord(null)}
+            onConfirm={handleDeleteRecord}
+          />
         )}
 
         {editOpen && (

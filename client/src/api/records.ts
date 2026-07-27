@@ -29,3 +29,18 @@ export const createRecord = async (petId: string, input: CreateRecordInput): Pro
   const { data } = await api.post<ApiEnvelope<HealthRecord>>(`/pets/${petId}/records`, input);
   return data.data;
 };
+
+export type UpdateRecordInput = Partial<CreateRecordInput>;
+
+export const updateRecord = async (
+  petId: string,
+  recordId: string,
+  input: UpdateRecordInput,
+): Promise<HealthRecord> => {
+  const { data } = await api.patch<ApiEnvelope<HealthRecord>>(`/pets/${petId}/records/${recordId}`, input);
+  return data.data;
+};
+
+export const deleteRecord = async (petId: string, recordId: string): Promise<void> => {
+  await api.delete(`/pets/${petId}/records/${recordId}`);
+};
