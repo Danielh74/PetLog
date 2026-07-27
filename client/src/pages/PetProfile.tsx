@@ -70,7 +70,9 @@ const AddRecordForm = ({
       title: title.trim() || meta.label,
       date: new Date(date).toISOString(),
       ...(notes && { notes }),
-      ...(type === 'weight' && weight && { weight: Number(weight) }),
+      // The schema wants a positive number. Number('4.5kg') is NaN and
+      // Number('0') is 0 — both come back 400, so only send a real reading.
+      ...(type === 'weight' && Number(weight) > 0 && { weight: Number(weight) }),
       ...(nextDueDate && { nextDueDate: new Date(nextDueDate).toISOString() }),
     });
   };
@@ -131,7 +133,10 @@ const EditPetForm = ({
       name: name.trim(),
       species,
       breed: breed.trim() || undefined,
-      ...(dob && { dob: new Date(dob).toISOString() }),
+      // updatePetSchema wants z.iso.date(), a calendar day with no time. The
+      // pet arrives from the API as a full ISO datetime, so trim it back —
+      // otherwise saving without touching the birthday field returns a 400.
+      ...(dob && { dob: dob.slice(0, 10) }),
     });
   };
 

@@ -78,7 +78,11 @@ const Onboarding = () => {
         name,
         species,
         ...(breed && { breed }),
-        ...(dob && { dob: new Date(dob).toISOString() }),
+        // createPetSchema types dob as z.iso.date() — a calendar day, no time.
+        // toISOString() appended T00:00:00.000Z and the request came back 400,
+        // so any pet given a birthday failed to save. Health records are the
+        // opposite: their `date` is z.iso.datetime() and does want the time.
+        ...(dob && { dob: dob.slice(0, 10) }),
       });
 
       const jobs: Promise<unknown>[] = [];
@@ -87,7 +91,9 @@ const Onboarding = () => {
           jobs.push(createReminder(pet._id, { title: item.title, dueDate: addMonthsToNow(item.addMonths) }));
         }
       }
-      if (weight) {
+      // Positive numbers only: the schema rejects 0 and NaN, and a typo like
+      // "4.5kg" would otherwise be sent as null and 400 silently.
+      if (Number(weight) > 0) {
         jobs.push(
           createRecord(pet._id, {
             type: 'weight',

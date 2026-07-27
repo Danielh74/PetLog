@@ -47,3 +47,8 @@ coverage/
 # OS files
 .DS_Store
 Thumbs.db
+
+# "Copy as PowerShell / fetch / cURL" dumps from DevTools. These carry a live
+# Authorization header, and one was nearly committed into src/pages/.
+$*
+*.har
