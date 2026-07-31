@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import Icon from '../components/Icon.tsx';
 import './Landing.css';
+import { useAuth } from '../context/useAuth.ts';
+import { useState } from 'react';
 
 const FEATURES = [
   {
@@ -40,6 +42,20 @@ const STEPS = [
 
 const Landing = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
+  const [logging, setLogging] = useState(false);
+  const loginWithDemoUser = async () => {
+    setLogging(true);
+    try {
+      await login('test@example.com', '123456');
+      navigate('/dashboard');
+    } catch {
+      throw new Error('An error has occurred')
+    }
+    finally {
+      setLogging(false);
+    }
+  }
 
   return (
     <div className="landing-wrap">
@@ -55,8 +71,11 @@ const Landing = () => {
           <button onClick={() => navigate('/login')} className="btn-text">
             Log in
           </button>
-          <button onClick={() => navigate('/pets/new')} className="btn btn-primary">
+          <button onClick={() => navigate('/Register')} className="btn btn-primary">
             Get started
+          </button>
+          <button onClick={loginWithDemoUser} disabled={logging} className="btn btn-danger">
+            Log in with demo user
           </button>
         </div>
       </header>
@@ -84,9 +103,6 @@ const Landing = () => {
             </div>
           </div>
 
-          {/* Was a filled brand panel with its own urgency headline, which read
-              as a second call to action and pulled attention off the real one.
-              Now a quiet, outlined preview of the record itself. */}
           <div className="landing-hero-right">
             <div className="landing-preview">
               <div className="landing-preview-head">
@@ -187,7 +203,7 @@ const Landing = () => {
           </div>
         </div>
         <div className="landing-footer-bottom">
-          <span>© 2026 PetLog</span>
+          <span>© {new Date().getFullYear()} PetLog</span>
           <span>·</span>
           <span>Not a substitute for veterinary care</span>
         </div>

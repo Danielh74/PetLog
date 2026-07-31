@@ -271,7 +271,7 @@ const PetProfile = () => {
         await createReminder(id, { title: `${input.title} due`, dueDate: input.nextDueDate! });
         loadReminders();
       } catch {
-        // ignore — the health record saved fine
+        // showToast("Couldn't save reminder");
       }
     }
     closeSheet();

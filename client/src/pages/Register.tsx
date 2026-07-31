@@ -10,9 +10,10 @@ const BULLETS = [
   { icon: 'ios_share', text: 'Share a read-only record with any vet in one link' },
 ];
 
-const Login = () => {
-  const { login, loginWithGoogle } = useAuth();
+const Register = () => {
+  const { register, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -23,10 +24,10 @@ const Login = () => {
     setError('');
     setBusy(true);
     try {
-      await login(email, password);
+      await register(name, email, password);
       navigate('/dashboard');
     } catch {
-      setError('Invalid email or password.');
+      setError('Could not create account. Try a different email.');
     } finally {
       setBusy(false);
     }
@@ -73,12 +74,16 @@ const Login = () => {
 
       <div className="auth-form-wrap">
         <div className="auth-form-col">
-          <h2 className="auth-form-title">Welcome back</h2>
+          <h2 className="auth-form-title">reate your account</h2>
           <p className="muted auth-form-subtitle">
-            Log in to see your pets' latest records.
+            Start your pet’s health record.
           </p>
 
           <form onSubmit={handleSubmit}>
+            <div className="field">
+              <label>Name</label>
+              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Dana K." required />
+            </div>
             <div className="field">
               <label>Email</label>
               <input
@@ -105,7 +110,7 @@ const Login = () => {
             {error && <p className="error-text">{error}</p>}
 
             <button type="submit" className="btn btn-primary auth-submit" disabled={busy}>
-              Log in
+              Create account
             </button>
           </form>
 
@@ -121,9 +126,9 @@ const Login = () => {
           </button>
 
           <p className="muted login-footer">
-            New here?
-            <span className="link-text" onClick={() => navigate('/register')}>
-              Create an account
+            Already have an account?
+            <span className="link-text" onClick={() => navigate('/login')}>
+              Log in
             </span>
           </p>
         </div>
@@ -132,4 +137,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;
