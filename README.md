@@ -120,6 +120,8 @@ Visit `http://localhost:5173`.
 
 ## API Overview
 
+Interactive, always-up-to-date API docs are served by the running server via Swagger UI at **`/api-docs`** (e.g. `http://localhost:5000/api-docs`), with the raw OpenAPI 3.0 document at `/api-docs.json`. The source spec lives at [server/src/docs/openapi.ts](server/src/docs/openapi.ts).
+
 All endpoints are prefixed with `/api` and, except where noted, require a `Bearer <Firebase ID token>` header.
 
 | Method | Endpoint | Description |
