@@ -10,6 +10,7 @@ import Onboarding from './pages/Onboarding.tsx';
 import PetProfile from './pages/PetProfile.tsx';
 import SymptomChecker from './pages/SymptomChecker.tsx';
 import SharePage from './pages/SharePage.tsx';
+import Register from './pages/Register.tsx';
 
 const AuthenticatedRoot = () => {
   const { firebaseUser, loading } = useAuth();
@@ -24,6 +25,7 @@ function App() {
         <Routes>
           <Route path="/" element={<AuthenticatedRoot />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/share/:token" element={<SharePage />} />
           <Route
             path="/dashboard"
