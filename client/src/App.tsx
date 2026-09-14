@@ -11,6 +11,7 @@ import PetProfile from './pages/PetProfile.tsx';
 import SymptomChecker from './pages/SymptomChecker.tsx';
 import SharePage from './pages/SharePage.tsx';
 import Register from './pages/Register.tsx';
+import AppLayout from './components/AppLayout.tsx';
 
 const AuthenticatedRoot = () => {
   const { firebaseUser, loading } = useAuth();
@@ -31,7 +32,9 @@ function App() {
             path="/dashboard"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <AppLayout>
+                  <Dashboard />
+                </AppLayout>
               </ProtectedRoute>
             }
           />
@@ -42,7 +45,9 @@ function App() {
             path="/account"
             element={
               <ProtectedRoute>
-                <Account />
+                <AppLayout>
+                  <Account />
+                </AppLayout>
               </ProtectedRoute>
             }
           />
@@ -58,7 +63,9 @@ function App() {
             path="/pets/:id"
             element={
               <ProtectedRoute>
-                <PetProfile />
+                <AppLayout>
+                  <PetProfile />
+                </AppLayout>
               </ProtectedRoute>
             }
           />

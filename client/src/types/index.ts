@@ -36,9 +36,11 @@ export interface HealthRecord {
   updatedAt: string;
 }
 
+type ReminderPet = Pick<Pet, "_id" | "name" | "species">;
+
 export interface Reminder {
   _id: string;
-  pet: string | { _id: string; name: string; species: Species };
+  pet: ReminderPet;
   owner: string;
   title: string;
   dueDate: string;
